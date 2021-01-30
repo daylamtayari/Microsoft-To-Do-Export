@@ -37,4 +37,47 @@ public class API {
     protected static ArrayList<JSONObject> listContents;                            //JSON object arraylist containing the contents of all of the lists.
     //Its values are parallel to the values of the listIDs and lists arraylists.
 
+    /**
+     * This method gets all of the task
+     * lists of a user and assigns the
+     * values to the listIDs and lists arraylists.
+     * @throws IOException
+     */
+    protected static void getLists() throws IOException {
+        String response="";
+        URL url=new URL(String.format(API_CORE, LISTS_API));
+        HttpURLConnection httpCon=(HttpURLConnection) url.openConnection();
+        httpCon.setRequestMethod("GET");
+        httpCon.setRequestProperty("Authorization", Main.token);
+        if(httpCon.getResponseCode() == HttpURLConnection.HTTP_OK){
+            BufferedReader br=new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
+            String inputLine;
+            while((inputLine=br.readLine())!=null){
+                response+=inputLine;
+            }
+        }
+        Parser.retrieveLists(response);
+    }
+
+    /**
+     * This method retrieves the contents of
+     * a task list and adds it to the arraylist.
+     * @param id    String value representing the ID of the task list.
+     * @throws IOException
+     */
+    protected static void getList(String id) throws IOException {
+        String response="";
+        URL url=new URL(String.format(API_CORE, String.format(LIST_TASK_API, id)));
+        HttpURLConnection httpCon=(HttpURLConnection) url.openConnection();
+        httpCon.setRequestMethod("GET");
+        httpCon.setRequestProperty("Authorization", Main.token);
+        if(httpCon.getResponseCode()== HttpURLConnection.HTTP_OK){
+            BufferedReader br=new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
+            String inputLine;
+            while((inputLine=br.readLine())!=null){
+                response+=inputLine;
+            }
+        }
+        Parser.retrieveLists(response);
+    }
 }
