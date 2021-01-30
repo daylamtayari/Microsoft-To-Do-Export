@@ -16,6 +16,7 @@
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.ArrayList;
 
 /**
  * This class is responsible for the
@@ -38,5 +39,20 @@ public class Parser {
                API.listIDs.add(jo.getString("id"));
             }
         }
+    }
+
+    /**
+     * This method parses all of the contents (tasks)
+     * from a task list retrieval JSON API response.
+     * @param response  String value representing the JSON API response contents.
+     */
+    protected static void retrieveContents(String response){
+        ArrayList<JSONObject> tasks=new ArrayList<JSONObject>();
+        JSONObject jsonResponse=new JSONObject(response);
+        JSONArray contents=jsonResponse.getJSONArray("value");
+        for(int i=0; i<contents.length(); i++){
+            tasks.add(contents.getJSONObject(i));
+        }
+        API.listContents.add(tasks);
     }
 }

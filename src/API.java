@@ -20,6 +20,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONObject;
 
 /**
@@ -27,14 +29,14 @@ import org.json.JSONObject;
  * API calls and processing.
  */
 public class API {
-    private static final String API_CORE="https://graph.microsoft.com/v1.0/%s";     //Formatted string value representing the core of the Microsoft Graph v1.0 API query.
-    private static final String LISTS_API="me/todo/lists";                          //String value representing the list retrieval API suffix.
-    private static final String LIST_TASK_API="me/todo/lists/%s/tasks";             //Formatted string value representing the list tasks retrieval API suffix.
-    protected static ArrayList<String> listIDs;                                     //String arraylist containing all of the IDs of the task lists of the user.
+    private static final String API_CORE="https://graph.microsoft.com/v1.0/%s";                 //Formatted string value representing the core of the Microsoft Graph v1.0 API query.
+    private static final String LISTS_API="me/todo/lists";                                      //String value representing the list retrieval API suffix.
+    private static final String LIST_TASK_API="me/todo/lists/%s/tasks";                         //Formatted string value representing the list tasks retrieval API suffix.
+    protected static ArrayList<String> listIDs = new ArrayList<String>();                       //String arraylist containing all of the IDs of the task lists of the user.
     //// Its values are parallel to those of the lists and listContents arraylists.
-    protected static ArrayList<JSONObject> lists;                                   //JSON object arraylist containing all of the list JSON objects.
+    protected static ArrayList<JSONObject> lists = new ArrayList<JSONObject>();                 //JSON object arraylist containing all of the list JSON objects.
     //Its values are parallel to the values of the listIDs and listContents arraylists.
-    protected static ArrayList<JSONObject> listContents;                            //JSON object arraylist containing the contents of all of the lists.
+    protected static List<List<JSONObject>> listContents= new ArrayList<List<JSONObject>>();    //JSON object arraylist containing the contents of all of the lists.
     //Its values are parallel to the values of the listIDs and lists arraylists.
 
     /**
