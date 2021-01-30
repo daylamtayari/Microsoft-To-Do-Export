@@ -36,7 +36,7 @@ public class API {
     //// Its values are parallel to those of the lists and listContents arraylists.
     protected static ArrayList<JSONObject> lists = new ArrayList<JSONObject>();                 //JSON object arraylist containing all of the list JSON objects.
     //Its values are parallel to the values of the listIDs and listContents arraylists.
-    protected static List<List<JSONObject>> listContents= new ArrayList<List<JSONObject>>();    //JSON object arraylist containing the contents of all of the lists.
+    protected static List<List<Task>> listContents= new ArrayList<List<Task>>();    //JSON object arraylist containing the contents of all of the lists.
     //Its values are parallel to the values of the listIDs and lists arraylists.
 
     /**

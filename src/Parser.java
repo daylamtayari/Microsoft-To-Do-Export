@@ -47,11 +47,25 @@ public class Parser {
      * @param response  String value representing the JSON API response contents.
      */
     protected static void retrieveContents(String response){
-        ArrayList<JSONObject> tasks=new ArrayList<JSONObject>();
+        ArrayList<Task> tasks=new ArrayList<Task>();
         JSONObject jsonResponse=new JSONObject(response);
         JSONArray contents=jsonResponse.getJSONArray("value");
         for(int i=0; i<contents.length(); i++){
-            tasks.add(contents.getJSONObject(i));
+            JSONObject jo=contents.getJSONObject(i);
+            if(jo.getString("status").equals("notStarted")){
+                Task task=new Task();
+                task.setTitle(jo.getString("title"));
+                if(jo.getString("importance").equals("normal")){
+                    task.setImportance(2);
+                }
+                else{
+                    task.setImportance(1);
+                }
+                JSONObject date=jo.getJSONObject("dueDateTime");
+                task.setDate(date.getString("dateTime"));
+                task.setTZ("timeZone");
+                tasks.add(task);
+            }
         }
         API.listContents.add(tasks);
     }
