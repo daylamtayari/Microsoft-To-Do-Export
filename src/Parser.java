@@ -35,8 +35,10 @@ public class Parser {
             JSONObject jo=contents.getJSONObject(i);
             String name=jo.getString("wellknownListName");
             if(name.equals("none")){
-               API.lists.add(jo);
-               API.listIDs.add(jo.getString("id"));
+               Lists list=new Lists();
+               list.setID(jo.getString("id"));
+               list.setName(jo.getString("displayName"));
+               API.lists.add(list);
             }
         }
     }
