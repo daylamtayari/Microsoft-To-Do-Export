@@ -78,4 +78,15 @@ public class API {
         }
         Parser.retrieveLists(response);
     }
+
+    /**
+     * This method calls the getList method
+     * and retrieves all of the tasks.
+     * @throws IOException
+     */
+    protected static void getTasks() throws IOException {
+        for(Lists l: lists){
+            getList(l.getID());
+        }
+    }
 }

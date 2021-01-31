@@ -14,13 +14,66 @@
  * Github project home page: https://github.com/daylamtayari/Microsoft-To-Do-Export
  */
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     protected static List<List<String>> contents;
     protected static String token;
 
-    public static void main(String[] args){
-
+    public static void main(String[] args) {
+        Scanner sc=new Scanner(System.in);
+        System.out.print(
+                  "\nWelcome to Microsoft To Do export."
+                + "\nAn unofficial tool to export your Microsoft To Do tasks."
+                + "\n\nIf you find this tool useful, please consider helping to support me financially:"
+                + "\nhttps://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: 15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX"
+                + "\n\nRetrieve your token from..."
+                + "\nToken: "
+        );
+        token=sc.nextLine();
+        System.out.print("\nRetrieving lists...");
+        try{
+            API.getLists();
+        }
+        catch(Exception e){
+            System.out.print("\nError retrieving lists, please make sure the token is correct.");
+            return;
+        }
+        System.out.print("\nRetrieved lists.");
+        System.out.print("\nLists retrieved: ");
+        for(Lists l: API.lists){
+            System.out.print("\n- "+l.getName());
+        }
+        System.out.print("\nRetrieving tasks...");
+        try {
+            API.getTasks();
+        }
+        catch(Exception e){
+            System.out.print("\nError retrieving tasks.");
+            return;
+        }
+        System.out.print("\nRetrieved tasks.");
+        System.out.print(
+                  "\nWhich format do you want to export the tasks:"
+                + "\n1. Text format."
+                + "\n2. Todoist CSV format."
+        );
+        int selection=Integer.parseInt(sc.nextLine());
+        System.out.print("\nPlease enter the complete file path of where you want to save the output file: ");
+        Export.setFP(sc.nextLine());
+        if(selection==1){
+            Export.exportText();
+        }
+        else{
+            Export.exportCSV();
+        }
+        System.out.print(
+                  "\nFile exported."
+                + "\n\nThank you for using this program."
+                + "\n\nIf you find this tool useful, please consider helping to support me financially:"
+                + "\nhttps://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: 15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX"
+        );
     }
 }
