@@ -22,6 +22,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 /**
@@ -29,6 +35,7 @@ import org.json.JSONObject;
  * API calls and processing.
  */
 public class API {
+    private static final CloseableHttpClient httpClient=HttpClients.createDefault();
     private static final String API_CORE="https://graph.microsoft.com/v1.0/%s";                 //Formatted string value representing the core of the Microsoft Graph v1.0 API query.
     private static final String LISTS_API="me/todo/lists";                                      //String value representing the list retrieval API suffix.
     private static final String LIST_TASK_API="me/todo/lists/%s/tasks";                         //Formatted string value representing the list tasks retrieval API suffix.
@@ -42,18 +49,11 @@ public class API {
      * @throws IOException
      */
     protected static void getLists() throws IOException {
-        String response="";
-        URL url=new URL(String.format(API_CORE, LISTS_API));
-        HttpURLConnection httpCon=(HttpURLConnection) url.openConnection();
-        httpCon.setRequestMethod("GET");
-        httpCon.setRequestProperty("Authorization", Main.token);
-        if(httpCon.getResponseCode() == HttpURLConnection.HTTP_OK){
-            BufferedReader br=new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
-            String inputLine;
-            while((inputLine=br.readLine())!=null){
-                response+=inputLine;
-            }
-        }
+        HttpGet req=new HttpGet(String.format(API_CORE, LISTS_API));
+        req.addHeader("Authorization", Main.token);
+        CloseableHttpResponse res=httpClient.execute(req);
+        HttpEntity ent= res.getEntity();
+        String response= EntityUtils.toString(ent);
         Parser.retrieveLists(response);
     }
 
@@ -64,19 +64,12 @@ public class API {
      * @throws IOException
      */
     protected static void getList(String id) throws IOException {
-        String response="";
-        URL url=new URL(String.format(API_CORE, String.format(LIST_TASK_API, id)));
-        HttpURLConnection httpCon=(HttpURLConnection) url.openConnection();
-        httpCon.setRequestMethod("GET");
-        httpCon.setRequestProperty("Authorization", Main.token);
-        if(httpCon.getResponseCode()== HttpURLConnection.HTTP_OK){
-            BufferedReader br=new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
-            String inputLine;
-            while((inputLine=br.readLine())!=null){
-                response+=inputLine;
-            }
-        }
-        Parser.retrieveLists(response);
+        HttpGet req=new HttpGet(String.format(API_CORE, String.format(LIST_TASK_API, id)));
+        req.addHeader("Authorization", Main.token);
+        CloseableHttpResponse res=httpClient.execute(req);
+        HttpEntity ent= res.getEntity();
+        String response= EntityUtils.toString(ent);
+        Parser.retrieveContents(response);
     }
 
     /**

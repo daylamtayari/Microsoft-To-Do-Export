@@ -58,14 +58,20 @@ public class Parser {
                 Task task=new Task();
                 task.setTitle(jo.getString("title"));
                 if(jo.getString("importance").equals("normal")){
-                    task.setImportance(2);
+                    task.setImportance(4);
                 }
                 else{
                     task.setImportance(1);
                 }
-                JSONObject date=jo.getJSONObject("dueDateTime");
-                task.setDate(date.getString("dateTime"));
-                task.setTZ("timeZone");
+                try{
+                    JSONObject date=jo.getJSONObject("dueDateTime");
+                    task.setDate(date.getString("dateTime"));
+                    task.setTZ(date.getString("timeZone"));
+                }
+                catch(Exception e){     //For when a task has no due date.
+                    task.setDate("");
+                    task.setTZ("");
+                }
                 tasks.add(task);
             }
         }
