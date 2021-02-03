@@ -14,7 +14,6 @@
  * Github project home page: https://github.com/daylamtayari/Microsoft-To-Do-Export
  */
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
