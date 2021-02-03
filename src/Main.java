@@ -33,44 +33,60 @@ public class Main {
                 + "\nToken: "
         );
         token=sc.nextLine();
+        System.out.print(
+                  "\nWhich format do you want to export the tasks:"
+                + "\n1. Text format."
+                + "\n2. Todoist CSV format."
+                + "\n3. Raw JSON format."
+        );
+        int selection=-1;
+        try {
+            selection = Integer.parseInt(sc.nextLine());
+        }
+        catch(Exception ignored){}
+        while(selection<1 || selection>3){
+            System.out.print("\nINCORRECT INPUT.\nPlease enter a number between 1 and 3: ");
+            try{
+                selection = Integer.parseInt(sc.nextLine());
+            }
+            catch(Exception ignored){}
+        }
+        System.out.print("\nPlease enter the complete file path of where you want to save the output file: ");
+        Export.setFP(sc.nextLine());
         System.out.print("\nRetrieving lists...");
-        try{
+        try {
             API.getLists();
         }
-        catch(Exception e){
+        catch(Exception e) {
             System.out.print("\nError retrieving lists, please make sure the token is correct.");
             return;
         }
         System.out.print("\nRetrieved lists.");
         System.out.print("\nLists retrieved: ");
-        for(Lists l: API.lists){
-            System.out.print("\n- "+l.getName());
+        for(Lists l : API.lists) {
+            System.out.print("\n- " + l.getName());
         }
         System.out.print("\nRetrieving tasks...");
         try {
-            API.getTasks();
+            API.getTasks(selection == 3);
         }
-        catch(Exception e){
+        catch(Exception e) {
             System.out.print("\nError retrieving tasks.");
             return;
         }
         System.out.print("\nRetrieved tasks.");
-        System.out.print(
-                  "\nWhich format do you want to export the tasks:"
-                + "\n1. Text format."
-                + "\n2. Todoist CSV format."
-        );
-        int selection=Integer.parseInt(sc.nextLine());
-        System.out.print("\nPlease enter the complete file path of where you want to save the output file: ");
-        Export.setFP(sc.nextLine());
+        System.out.print("\nExporting file...");
         if(selection==1){
             Export.exportText();
         }
-        else{
+        else if(selection==2){
             Export.exportCSV();
         }
+        else{
+            Export.exportJSON();
+        }
         System.out.print(
-                  "\nFile exported."
+                  "\n\nFile exported to: "+Export.getFP()+"."
                 + "\n\nThank you for using this program."
                 + "\n\nIf you find this tool useful, please consider helping to support me financially:"
                 + "\nhttps://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: 15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX"

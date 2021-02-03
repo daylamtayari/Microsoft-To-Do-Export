@@ -58,12 +58,32 @@ public class Export {
     }
 
     /**
+     * This method exports the raw JSON values.
+     */
+    protected static void exportJSON(){
+        String content="{";
+        for(String s: API.rawJSON){
+            content+=s;
+        }
+        content+="}";
+        ArrayList<String> output=new ArrayList<String>();
+        output.add(content);
+        write(output);
+    }
+
+    /**
      * Mutator for the outputFP variable.
      * @param fp    String variable representing the output file path.
      */
     protected static void setFP(String fp){
         outputFP=fp;
     }
+
+    /**
+     * Accessor for the outputFP variable.
+     * @return String   String variable representing the output file path.
+     */
+    protected static String getFP(){return outputFP;}
 
     /**
      * This method writes out

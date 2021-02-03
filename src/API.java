@@ -21,7 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -39,8 +38,9 @@ public class API {
     private static final String API_CORE="https://graph.microsoft.com/v1.0/%s";                 //Formatted string value representing the core of the Microsoft Graph v1.0 API query.
     private static final String LISTS_API="me/todo/lists";                                      //String value representing the list retrieval API suffix.
     private static final String LIST_TASK_API="me/todo/lists/%s/tasks";                         //Formatted string value representing the list tasks retrieval API suffix.
-    protected static ArrayList<Lists> lists = new ArrayList<Lists>();                           //Lists arraylist containing the information of the lists.
-    protected static List<List<Task>> listContents= new ArrayList<List<Task>>();                //Task arraylist containing the contents of all of the lists.
+    protected static ArrayList<Lists> lists = new ArrayList<Lists>();                               //Lists arraylist containing the information of the lists.
+    protected static List<List<Task>> listContents= new ArrayList<List<Task>>();                         //Task arraylist containing the contents of all of the lists.
+    protected static ArrayList<String> rawJSON=new ArrayList<String>();                         //String arraylist containing raw JSON values of all fo the lists.
 
     /**
      * This method gets all of the task
@@ -63,23 +63,29 @@ public class API {
      * @param id    String value representing the ID of the task list.
      * @throws IOException
      */
-    protected static void getList(String id) throws IOException {
+    protected static void getList(String id, boolean json) throws IOException {
         HttpGet req=new HttpGet(String.format(API_CORE, String.format(LIST_TASK_API, id)));
         req.addHeader("Authorization", Main.token);
         CloseableHttpResponse res=httpClient.execute(req);
         HttpEntity ent= res.getEntity();
         String response= EntityUtils.toString(ent);
-        Parser.retrieveContents(response);
+        if(json){
+            rawJSON.add(response+",");
+        }
+        else {
+            Parser.retrieveContents(response);
+        }
     }
 
     /**
      * This method calls the getList method
      * and retrieves all of the tasks.
+     * @param json  Boolean value representing whether or not the user's selected output is raw JSON or not.
      * @throws IOException
      */
-    protected static void getTasks() throws IOException {
+    protected static void getTasks(boolean json) throws IOException {
         for(Lists l: lists){
-            getList(l.getID());
+            getList(l.getID(), json);
         }
     }
 }
