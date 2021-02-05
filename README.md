@@ -35,7 +35,10 @@ For more details, please check out the official page: https://www.gnu.org/licens
 
 If you find this project helpful, please feel free to check out my other projects and if you wish, help support me financially.  
 My other projects: https://github.com/daylamtayari#projects  
-Help support me financially: https://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: `15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX`.  
+Help support me financially: 
+  - Paypal: https://paypal.me/daylamtayari 
+  - Cashapp: https://cash.app/$daylamtayari 
+  - BTC: `15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX`.  
 
 ## Disclaimer:
 
