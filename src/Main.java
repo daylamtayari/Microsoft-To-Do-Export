@@ -33,10 +33,11 @@ public class Main {
         );
         token=sc.nextLine();
         System.out.print(
-                  "\nWhich format do you want to export the tasks:"
+                  "\nFormats:"
                 + "\n1. Text format."
                 + "\n2. Todoist CSV format."
                 + "\n3. Raw JSON format."
+                + "\nWhich format do you want to export the tasks: "
         );
         int selection=-1;
         try {

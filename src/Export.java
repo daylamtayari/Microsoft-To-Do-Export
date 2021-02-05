@@ -61,11 +61,14 @@ public class Export {
      * This method exports the raw JSON values.
      */
     protected static void exportJSON(){
-        String content="{";
+        String content="{\"about\":\"File exported using Microsoft To Do Export https://github.com/daylamtayari/Microsoft-To-Do-Export\",\"lists\":[";
         for(String s: API.rawJSON){
             content+=s;
         }
-        content+="}";
+        if(content.lastIndexOf(',')==content.length()-1){
+            content=content.substring(0, content.length()-1);
+        }
+        content+="]}";
         ArrayList<String> output=new ArrayList<String>();
         output.add(content);
         write(output);
