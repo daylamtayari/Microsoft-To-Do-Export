@@ -18,8 +18,15 @@
 1. Download the latest release from the [release tab](https://github.com/daylamtayari/Microsoft-To-Do-Export/releases).  
 2. Retrieve your token.  
   a. Go to Microsoft's Graph API Explorer: https://developer.microsoft.com/en-us/graph/graph-explorer  
-  b. Sign in with the account that you want to retrieve the tasks from.  
-  c. 
+  b. Sign in with the account that you want to retrieve the tasks from.    
+  ![](https://i.gyazo.com/10f48f12511f793168cb3c9b5d6a370a.png)    
+  c. Select the `my To Do task lists` option.    
+  ![](https://i.gyazo.com/9b176e8e35b112c1ce769f47de80bdf5.png)  
+  d. Click the `Modify permissions` tab and consent to the `Tasks.ReadWrite` permission.   
+  ![](https://i.gyazo.com/2bd190ebc21e1826cb02216ad9d899d9.png)    
+  e. Navigate to the `Access token` tab and copy the access token.   
+     This is the access token you will use, you can now close the Microsoft Graph Explorer.
+     ![](https://i.gyazo.com/ae4aabb9d672ae34e38706153cd54738.png)   
 3. Run the executable.
 4. Input your token into the program when prompted.
 5. Select your desired output format.
