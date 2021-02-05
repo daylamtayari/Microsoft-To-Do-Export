@@ -18,10 +18,31 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    protected static List<List<String>> contents;
-    protected static String token;
+    protected static List<List<String>> contents;       //2D list which contains all of the contents.
+    protected static String token;                      //String value representing the user's token.
 
-    public static void main(String[] args) {
+    /**
+     * Main method thar runs the program.
+     * @param args
+     */
+    public static void main(String[] args){
+        runner();
+        //Keep the console window open after completion.
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                for(;;)
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {}
+            }
+        }).run();
+    }
+
+    /**
+     * The runner method of the program.
+     */
+    public static void runner() {
         Scanner sc=new Scanner(System.in);
         System.out.print(
                   "\nWelcome to Microsoft To Do export."
@@ -91,5 +112,6 @@ public class Main {
                 + "\n\nIf you find this tool useful, please consider helping to support me financially:"
                 + "\nhttps://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: 15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX"
         );
+        sc.close();
     }
 }
