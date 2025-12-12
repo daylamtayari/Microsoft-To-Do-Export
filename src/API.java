@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Daylam Tayari <daylam@tayari.gg>
+ * Copyright (c) 2021, 2025 Daylam Tayari <daylam@tayari.gg>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3as published by the Free Software Foundation.
  *
@@ -20,6 +20,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class API {
     private static final CloseableHttpClient httpClient=HttpClients.createDefault();
     private static final String API_CORE="https://graph.microsoft.com/v1.0/%s";                 //Formatted string value representing the core of the Microsoft Graph v1.0 API query.
     private static final String LISTS_API="me/todo/lists";                                      //String value representing the list retrieval API suffix.
-    private static final String LIST_TASK_API="me/todo/lists/%s/tasks";                         //Formatted string value representing the list tasks retrieval API suffix.
+    private static final String LIST_TASK_API="me/todo/lists/%s/tasks?$skip=%d";                         //Formatted string value representing the list tasks retrieval API suffix.
     protected static ArrayList<Lists> lists = new ArrayList<Lists>();                               //Lists arraylist containing the information of the lists.
     protected static List<List<Task>> listContents= new ArrayList<List<Task>>();                         //Task arraylist containing the contents of all of the lists.
     protected static ArrayList<String> rawJSON=new ArrayList<String>();                         //String arraylist containing raw JSON values of all fo the lists.
@@ -56,19 +57,53 @@ public class API {
      * This method retrieves the contents of
      * a task list and adds it to the arraylist.
      * @param id    String value representing the ID of the task list.
+     * @param json  Boolean value representing whether to store raw JSON.
+     * @param skip  Integer value for pagination offset.
+     * @param tasks ArrayList to accumulate tasks across pagination, or null for initial call.
      * @throws IOException
      */
-    protected static void getList(String id, boolean json) throws IOException {
-        HttpGet req=new HttpGet(String.format(API_CORE, String.format(LIST_TASK_API, id)));
+    protected static void getList(String id, boolean json, Integer skip, ArrayList<Task> tasks) throws IOException {
+        boolean isInitialCall = (tasks == null);
+        if(isInitialCall) {
+            tasks = new ArrayList<Task>();
+        }
+
+        HttpGet req=new HttpGet(String.format(API_CORE, String.format(LIST_TASK_API, id, skip)));
         req.addHeader("Authorization", Main.token);
         CloseableHttpResponse res=httpClient.execute(req);
         HttpEntity ent= res.getEntity();
         String response= EntityUtils.toString(ent);
+        JSONObject resJSON=new JSONObject(response);
+
+        // Add opening bracket for this list
+        if(json && isInitialCall) {
+            rawJSON.add("[");
+        }
+
         if(json){
-            rawJSON.add(response+",");
+            String valueString = resJSON.get("value").toString();
+            rawJSON.add(valueString.substring(1, valueString.length() - 1));
         }
         else {
-            Parser.retrieveContents(response);
+            Parser.retrieveContents(response, tasks);
+        }
+
+        if (resJSON.has("@odata.nextLink")) {
+            String nextLink = resJSON.getString("@odata.nextLink");
+            int nextSkip = Integer.parseInt(nextLink.split("\\$skip=")[1]);
+            if(json) {
+                rawJSON.add(",");
+            }
+            getList(id, json, nextSkip, tasks);
+        }
+
+        // Close this list's array
+        if(isInitialCall) {
+            if(json) {
+                rawJSON.add("],");
+            } else {
+                listContents.add(tasks);
+            }
         }
     }
 
@@ -80,7 +115,13 @@ public class API {
      */
     protected static void getTasks(boolean json) throws IOException {
         for(Lists l: lists){
-            getList(l.getID(), json);
+            getList(l.getID(), json, 0, null);
+        }
+        if(json) {
+            // Remove trailing comma and add closing bracket
+            if(!rawJSON.isEmpty() && rawJSON.get(rawJSON.size() - 1).equals(",")) {
+                rawJSON.remove(rawJSON.size() - 1);
+            }
         }
     }
 }

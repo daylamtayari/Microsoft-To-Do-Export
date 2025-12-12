@@ -47,9 +47,9 @@ public class Parser {
      * This method parses all of the contents (tasks)
      * from a task list retrieval JSON API response.
      * @param response  String value representing the JSON API response contents.
+     * @param tasks     ArrayList to add tasks to.
      */
-    protected static void retrieveContents(String response){
-        ArrayList<Task> tasks=new ArrayList<Task>();
+    protected static void retrieveContents(String response, ArrayList<Task> tasks){
         JSONObject jsonResponse=new JSONObject(response);
         JSONArray contents=jsonResponse.getJSONArray("value");
         for(int i=0; i<contents.length(); i++){
@@ -75,6 +75,5 @@ public class Parser {
                 tasks.add(task);
             }
         }
-        API.listContents.add(tasks);
     }
 }
