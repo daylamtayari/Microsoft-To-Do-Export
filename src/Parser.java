@@ -34,7 +34,7 @@ public class Parser {
         for(int i=0; i<contents.length(); i++){
             JSONObject jo=contents.getJSONObject(i);
             String name=jo.getString("wellknownListName");
-            if(name.equals("none")){
+            if(name.equals("none") || name.equals("defaultList")){
                Lists list=new Lists();
                list.setID(jo.getString("id"));
                list.setName(jo.getString("displayName"));
