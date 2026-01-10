@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Daylam Tayari <daylam@tayari.gg>
+ * Copyright (c) 2021, 2026 Daylam Tayari <daylam@tayari.gg>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3as published by the Free Software Foundation.
  *
@@ -23,6 +23,7 @@ public class Task {
     private int importance;     //Integer value representing the importance level of the task.
     private String dueDate;     //String value representing the due date of the task.
     private String TZ;          //String value representing the timezone of the timestamp.
+    private String note;       // String value representing a task's note.
 
     /**
      * Constructor for the task object class.
@@ -55,10 +56,18 @@ public class Task {
 
     /**
      * Accessor for the timezone variable.
-     * @return String   String value representing the timezone of the
+     * @return String   String value representing the timezone of the timestamp.
      */
     public String getTZ(){
         return TZ;
+    }
+
+    /**
+     * Accessor for the notes variable.
+     * @return String   String value representing a task's note.
+     */
+    public String getNote(){
+        return note;
     }
 
     /**
@@ -91,5 +100,13 @@ public class Task {
      */
     public void setTZ(String TZ){
         this.TZ=TZ;
+    }
+
+    /**
+     * Mutator for the timezone variable.
+     * @param notes String variable representing a task's note.
+     */
+    public void setNote(String note){
+        this.note=note;
     }
 }
