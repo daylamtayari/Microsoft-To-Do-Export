@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Daylam Tayari <daylam@tayari.gg>
+ * Copyright (c) 2021,2026 Daylam Tayari <daylam@tayari.gg>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3as published by the Free Software Foundation.
  *
@@ -71,6 +71,14 @@ public class Parser {
                 catch(Exception e){     //For when a task has no due date.
                     task.setDate("");
                     task.setTZ("");
+                }
+                try {
+                    JSONObject body=jo.getJSONObject("body");
+                    String bodyContents=body.getString("content");
+                    task.setNote(bodyContents);
+                }
+                catch(Exception e){
+                    task.setNote("");
                 }
                 tasks.add(task);
             }
