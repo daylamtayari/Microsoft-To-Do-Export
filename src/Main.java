@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Daylam Tayari <daylam@tayari.gg>
+ * Copyright (c) 2021, 2026 Daylam Tayari <daylam@tayari.gg>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3as published by the Free Software Foundation.
  *
@@ -49,10 +49,18 @@ public class Main {
                 + "\nAn unofficial tool to export your Microsoft To Do tasks."
                 + "\n\nIf you find this tool useful, please consider helping to support me financially:"
                 + "\nhttps://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: 15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX"
-                + "\n\nRetrieve your token from..."
-                + "\nToken: "
         );
-        token=sc.nextLine();
+        token = System.getenv("MICROSOFT_TO_DO_TOKEN");
+        if (token == null || token.trim().isEmpty()) {
+            System.out.print(
+                  "\n\nRetrieve your token from the Microsoft graphql https://developer.microsoft.com/en-us/graph/graph-explorer..."
+                + "\n(Token can also be set with the MICROSOFT_TO_DO_TOKEN environment variable"
+                + "\nToken: "
+            );
+            token=sc.nextLine();
+        } else {
+            System.out.print("\n\nRetrieved token from environment variable\n");
+        }
         System.out.print(
                   "\nFormats:"
                 + "\n1. Text format."
