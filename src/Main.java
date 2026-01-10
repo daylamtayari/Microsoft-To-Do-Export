@@ -50,10 +50,11 @@ public class Main {
                 + "\n\nIf you find this tool useful, please consider helping to support me financially:"
                 + "\nhttps://paypal.me/daylamtayari https://cash.app/$daylamtayari BTC: 15KcKrsqW6DQdyZPrgRXXmsKkyyZzHAQVX"
         );
-        token = System.getenv("MICROSOFT_TO_DO_EXPORT_TOKEN");
+        token = System.getenv("MICROSOFT_TO_DO_TOKEN");
         if (token == null || token.trim().isEmpty()) {
             System.out.print(
                   "\n\nRetrieve your token from the Microsoft graphql https://developer.microsoft.com/en-us/graph/graph-explorer..."
+                + "\n(Token can also be set with the MICROSOFT_TO_DO_TOKEN environment variable"
                 + "\nToken: "
             );
             token=sc.nextLine();

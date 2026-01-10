@@ -20,7 +20,7 @@
   e. Navigate to the `Access token` tab and copy the access token.   
      This is the access token you will use, you can now close the Microsoft Graph Explorer.
 3. Run the executable.
-4. Input your token into the program when prompted.
+4. Input your token into the program when prompted or set it to the `MICROSOFT_TO_DO_TOKEN` environment variable beforehand.
 5. Select your desired output format.
 6. Enter your desired output path (complete file path). i.e. `C:\Downloads\export.csv`.
 
