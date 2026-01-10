@@ -31,11 +31,11 @@ public class Export {
      */
     protected static void exportCSV(){
         ArrayList<String> content=new ArrayList<String>();
-        content.add("TYPE,CONTENT,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE");
+        content.add("TYPE,CONTENT,DESCRIPTION,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE");
         for(int i=0; i<API.listContents.size(); i++){
             content.add("section,"+API.lists.get(i).getName()+",,,,,,,");
             for(Task t: API.listContents.get(i)){
-                content.add("task,"+t.getTitle()+","+t.getImportance()+",,,,"+t.getDate()+",en,"+t.getTZ());
+                content.add("task,"+t.getTitle()+","+t.getNote()+","+t.getImportance()+",,,,"+t.getDate()+",en,"+t.getTZ());
             }
         }
         write(content);
@@ -47,11 +47,11 @@ public class Export {
      */
     protected static void exportText(){
         ArrayList<String> output=new ArrayList<String>();
-        output.add("\tContent\tDue Date\tTimezone");
+        output.add("\tTitle\tContent\tDue Date\tTimezone");
         for(int i=0; i<API.listContents.size();i++){
             output.add(API.lists.get(i).getName());
             for(Task t: API.listContents.get(i)){
-                output.add("\t"+t.getTitle()+"\t"+t.getDate()+"\t"+t.getTZ());
+                output.add("\t"+t.getTitle()+"\t"+t.getNote()+"\t"+t.getDate()+"\t"+t.getTZ());
             }
         }
         write(output);
