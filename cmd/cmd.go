@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -12,8 +13,8 @@ import (
 type contextKey string
 
 var (
+	clientContextKey = contextKey("client")
 	loggerContextKey = contextKey("logger")
-	tokenContextKey  = contextKey("token")
 )
 
 var rootCmd = &cobra.Command{
@@ -36,7 +37,7 @@ var rootCmd = &cobra.Command{
 		// Token handling
 		envToken := os.Getenv("MSTDEXPORT_TOKEN")
 		if envToken != "" {
-			cmd.SetContext(context.WithValue(cmd.Context(), tokenContextKey, envToken))
+			createClient(cmd, envToken)
 			logger.Debug().Msg("Using token from environment variable")
 			return
 		}
@@ -45,7 +46,7 @@ var rootCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("Failed to parse token command flag")
 		}
 		if tokenFlag != "" {
-			cmd.SetContext(context.WithValue(cmd.Context(), tokenContextKey, tokenFlag))
+			createClient(cmd, tokenFlag)
 			logger.Debug().Msg("Using token from token flag")
 			return
 		}
@@ -59,7 +60,7 @@ var rootCmd = &cobra.Command{
 				logger.Fatal().Err(err).Msgf("Failed to read token file %q")
 				return
 			}
-			cmd.SetContext(context.WithValue(cmd.Context(), tokenContextKey, token))
+			createClient(cmd, string(token))
 			logger.Debug().Msg("Using token from token file")
 			return
 		}
@@ -83,4 +84,12 @@ func Execute() {
 
 func getLogger(cmd *cobra.Command) *zerolog.Logger {
 	return cmd.Context().Value(loggerContextKey).(*zerolog.Logger)
+}
+
+func getClient(cmd *cobra.Command) *mstodo.Client {
+	return cmd.Context().Value(clientContextKey).(*mstodo.Client)
+}
+
+func createClient(cmd *cobra.Command, token string) {
+	cmd.SetContext(context.WithValue(cmd.Context(), clientContextKey, mstodo.NewClient(nil, &token)))
 }
