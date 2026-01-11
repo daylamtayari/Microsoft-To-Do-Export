@@ -57,7 +57,7 @@ var rootCmd = &cobra.Command{
 		if tokenFile != "" {
 			token, err := os.ReadFile(tokenFile)
 			if err != nil {
-				logger.Fatal().Err(err).Msgf("Failed to read token file %q")
+				logger.Fatal().Err(err).Msgf("Failed to read token file %q", tokenFile)
 				return
 			}
 			createClient(cmd, string(token))
@@ -73,6 +73,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("token", "t", "", "Token value")
 	rootCmd.PersistentFlags().String("token-file", "", "File containing token")
 	rootCmd.MarkFlagsMutuallyExclusive("token", "token-file")
+	rootCmd.AddCommand(initListCmd())
 }
 
 func Execute() {
