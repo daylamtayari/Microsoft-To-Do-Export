@@ -35,22 +35,30 @@ type TaskRecurrence struct {
 	Range   TaskRecurrenceRange   `json:"range"`
 }
 
+type TaskChecklistItems struct {
+	DisplayName     string    `json:"displayName"`
+	CreatedDatetime time.Time `json:"createdDatetime"`
+	IsChecked       bool      `json:"isChecked"`
+	Id              string    `json:"id"`
+}
+
 type Task struct {
-	Id                   string          `json:"id"`
-	Status               string          `json:"status"`
-	Title                string          `json:"title"`
-	Importance           string          `json:"importance"`
-	IsReminderOn         string          `json:"isReminderOn"`
-	CreatedDateTime      time.Time       `json:"createdDateTime"`
-	LastModifiedDateTime time.Time       `json:"lastModifiedDateTime"`
-	HasAttachments       bool            `json:"hasAttachments"`
-	Categories           []string        `json:"categories"`
-	Body                 TaskBody        `json:"body"`
-	CompletedDateTime    *TaskTime       `json:"completedDateTime"`
-	DueDateTime          *TaskTime       `json:"dueDateTime"`
-	Recurrence           *TaskRecurrence `json:"recurrence"`
-	ReminderDateTime     *TaskTime       `json:"reminderDateTime"`
-	StartDateTime        *TaskTime       `json:"startDateTime"`
+	Id                   string              `json:"id"`
+	Status               string              `json:"status"`
+	Title                string              `json:"title"`
+	Importance           string              `json:"importance"`
+	IsReminderOn         string              `json:"isReminderOn"`
+	CreatedDateTime      time.Time           `json:"createdDateTime"`
+	LastModifiedDateTime time.Time           `json:"lastModifiedDateTime"`
+	HasAttachments       bool                `json:"hasAttachments"`
+	Categories           []string            `json:"categories"`
+	Body                 TaskBody            `json:"body"`
+	CompletedDateTime    *TaskTime           `json:"completedDateTime"`
+	DueDateTime          *TaskTime           `json:"dueDateTime"`
+	Recurrence           *TaskRecurrence     `json:"recurrence"`
+	ReminderDateTime     *TaskTime           `json:"reminderDateTime"`
+	StartDateTime        *TaskTime           `json:"startDateTime"`
+	ChecklistItems       *TaskChecklistItems `json:"checklistItems"`
 }
 
 type List struct {
