@@ -35,7 +35,7 @@ var rootCmd = &cobra.Command{
 		}
 		cmd.SetContext(context.WithValue(cmd.Context(), loggerContextKey, &logger))
 		// Token handling
-		envToken := os.Getenv("MSTDEXPORT_TOKEN")
+		envToken := os.Getenv("MSTODO_EXPORT_TOKEN")
 		if envToken != "" {
 			createClient(cmd, envToken)
 			logger.Debug().Msg("Using token from environment variable")
