@@ -47,7 +47,7 @@ type Task struct {
 	Status               string              `json:"status"`
 	Title                string              `json:"title"`
 	Importance           string              `json:"importance"`
-	IsReminderOn         string              `json:"isReminderOn"`
+	IsReminderOn         bool                `json:"isReminderOn"`
 	CreatedDateTime      time.Time           `json:"createdDateTime"`
 	LastModifiedDateTime time.Time           `json:"lastModifiedDateTime"`
 	HasAttachments       bool                `json:"hasAttachments"`
@@ -62,9 +62,10 @@ type Task struct {
 }
 
 type List struct {
-	DisplayName       string `json:"displayName"`
-	Id                string `json:"id"`
-	IsOwner           bool   `json:"isOwner"`
-	IsShared          bool   `json:"isShared"`
-	WellKnownListName string `json:"wellKnownListName"`
+	DisplayName       string  `json:"displayName"`
+	Id                string  `json:"id"`
+	IsOwner           bool    `json:"isOwner"`
+	IsShared          bool    `json:"isShared"`
+	WellKnownListName string  `json:"wellKnownListName"`
+	Tasks             *[]Task `json:"tasks"`
 }
