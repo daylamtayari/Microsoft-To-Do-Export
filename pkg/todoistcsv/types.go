@@ -18,8 +18,10 @@ const (
 
 type Content string
 
+// Task description
 type Description string
 
+// Task priority
 type Priority int
 
 const (
@@ -29,6 +31,9 @@ const (
 	Priority4
 )
 
+// Task indentation
+// 1 - parent task
+// 2<= - child task
 type Indent int
 
 const (
