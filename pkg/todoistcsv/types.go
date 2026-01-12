@@ -89,12 +89,13 @@ const (
 	NoneDurationUnit   = DurationUnit("None")
 )
 
-type Meta string
-
-const (
-	BoardLayout = Meta("view_style=board")
-)
-
 type Deadline time.Time
 
 type DeadlineLang LanguageCode
+
+type Meta string
+
+const (
+	ListLayout  = Meta("view_style=list")
+	BoardLayout = Meta("view_style=board")
+)
