@@ -57,21 +57,22 @@ type TaskTime struct {
 
 // Time returns the datetime in the correct timezone
 // The Datetime field contains a local time, and Timezone specifies which timezone it's in
-func (tt *TaskTime) Time() (time.Time, error) {
+// If the timezone format is not valid, it uses UTC
+func (tt *TaskTime) Time() time.Time {
 	if tt == nil {
-		return time.Time{}, nil
+		return time.Time{}
 	}
 
 	loc, err := time.LoadLocation(tt.Timezone)
 	if err != nil {
-		return time.Time{}, err
+		loc = time.UTC
 	}
 
 	year, month, day := tt.Datetime.Date()
 	hour, min, sec := tt.Datetime.Clock()
 	nsec := tt.Datetime.Nanosecond()
 
-	return time.Date(year, month, day, hour, min, sec, nsec, loc), nil
+	return time.Date(year, month, day, hour, min, sec, nsec, loc)
 }
 
 // Recurrence pattern
