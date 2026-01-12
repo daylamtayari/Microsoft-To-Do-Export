@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo-to-todoistcsv"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
@@ -60,11 +61,14 @@ var exportCmd = &cobra.Command{
 			outputBuilder.WriteString("Type,ID,Title,Status,Note,Due Date")
 			for i := range taskLists {
 				outputBuilder.WriteString("\nlist," + taskLists[i].Id + "," + taskLists[i].DisplayName + ",,,")
-				for _, t := range *taskLists[i].Tasks {
+				for _, t := range taskLists[i].Tasks {
 					outputBuilder.WriteString("\ntask," + t.Id + "," + t.Title + "," + t.Status + ",\"" + t.Body.Content + "\"," + t.DueDateTime.Time().String())
 				}
 			}
 			outputContents = outputBuilder.String()
+		case "todoist":
+			todoistExport := mstodo_to_todoistcsv.MSToDoToTodoistCsv(taskLists)
+			outputContents = todoistExport.CSV()
 		}
 
 		if raw {
