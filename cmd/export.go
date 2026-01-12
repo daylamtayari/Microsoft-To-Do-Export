@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
@@ -29,6 +29,13 @@ var exportCmd = &cobra.Command{
 		if err != nil {
 			logger.Fatal().Err(err).Msg("Failed to parse output command flag")
 		}
+		if outputFile == "mstodo_export.{file_type}" {
+			if outputType == "json" {
+				outputFile = "mstodo_export.json"
+			} else {
+				outputFile = "mstodo_export.csv"
+			}
+		}
 		raw, err := cmd.Flags().GetBool("raw")
 		if err != nil {
 			logger.Fatal().Err(err).Msg("Failed to parse raw command flag")
@@ -48,6 +55,16 @@ var exportCmd = &cobra.Command{
 				logger.Fatal().Err(err).Msg("Failed to marshal task lists to JSON")
 			}
 			outputContents = string(jsonOutput)
+		case "csv":
+			var outputBuilder strings.Builder
+			outputBuilder.WriteString("Type,ID,Title,Status,Note,Due Date")
+			for i := range taskLists {
+				outputBuilder.WriteString("\nlist," + taskLists[i].Id + "," + taskLists[i].DisplayName + ",,,")
+				for _, t := range *taskLists[i].Tasks {
+					outputBuilder.WriteString("\ntask," + t.Id + "," + t.Title + "," + t.Status + ",\"" + t.Body.Content + "\"," + t.DueDateTime.Time().String())
+				}
+			}
+			outputContents = outputBuilder.String()
 		}
 
 		if raw {
@@ -64,13 +81,9 @@ var exportCmd = &cobra.Command{
 
 func initExportCmd() *cobra.Command {
 	exportCmd.Flags().Bool("completed", false, "Include completed tasks")
-	exportCmd.Flags().StringP("output", "o", "mstdexport.{file_type}", "Output file name")
+	exportCmd.Flags().StringP("output", "o", "mstodo_export.{file_type}", "Output file name")
 	exportCmd.Flags().String("type", "json", "Output type (accepted values: 'json', 'todoist', 'csv')")
 	exportCmd.Flags().BoolP("raw", "r", false, "Output to stdout instead of a file and no table")
 	exportCmd.MarkFlagsMutuallyExclusive("output", "raw")
 	return exportCmd
-}
-
-func exportJson(taskLists mstodo.List) string {
-	return ""
 }
