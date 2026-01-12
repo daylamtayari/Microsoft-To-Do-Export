@@ -1,7 +1,6 @@
 package mstodo
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -18,7 +17,6 @@ func (c *Client) GetListTasks(listId string, completed bool) ([]Task, error) {
 		q := req.URL.Query()
 		q.Add("$filter", "status ne 'completed'")
 		req.URL.RawQuery = q.Encode()
-		fmt.Println(req.URL.String())
 	}
 
 	var tasks []Task

@@ -68,6 +68,6 @@ var listCmd = &cobra.Command{
 
 func initListCmd() *cobra.Command {
 	listCmd.Flags().BoolP("json", "j", false, "JSON output")
-	listCmd.Flags().StringP("output", "o", "mstd_lists.{file_type}", "Output file name")
+	listCmd.Flags().StringP("output", "o", "", "Output file name")
 	return listCmd
 }
