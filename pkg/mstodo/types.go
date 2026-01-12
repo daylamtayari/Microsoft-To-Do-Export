@@ -111,22 +111,22 @@ type TaskChecklistItems struct {
 
 // Task object
 type Task struct {
-	Id                   string                `json:"id"`
-	Status               string                `json:"status"`
-	Title                string                `json:"title"`
-	Importance           string                `json:"importance"`
-	IsReminderOn         bool                  `json:"isReminderOn"`
-	CreatedDateTime      MSTime                `json:"createdDateTime"`
-	LastModifiedDateTime MSTime                `json:"lastModifiedDateTime"`
-	HasAttachments       bool                  `json:"hasAttachments"`
-	Categories           []string              `json:"categories"`
-	Body                 TaskBody              `json:"body"`
-	CompletedDateTime    *TaskTime             `json:"completedDateTime"`
-	DueDateTime          *TaskTime             `json:"dueDateTime"`
-	Recurrence           *TaskRecurrence       `json:"recurrence"`
-	ReminderDateTime     *TaskTime             `json:"reminderDateTime"`
-	StartDateTime        *TaskTime             `json:"startDateTime"`
-	ChecklistItems       *[]TaskChecklistItems `json:"checklistItems"`
+	Id                   string               `json:"id"`
+	Status               string               `json:"status"`
+	Title                string               `json:"title"`
+	Importance           string               `json:"importance"`
+	IsReminderOn         bool                 `json:"isReminderOn"`
+	CreatedDateTime      MSTime               `json:"createdDateTime"`
+	LastModifiedDateTime MSTime               `json:"lastModifiedDateTime"`
+	HasAttachments       bool                 `json:"hasAttachments"`
+	Categories           []string             `json:"categories"`
+	Body                 TaskBody             `json:"body"`
+	CompletedDateTime    *TaskTime            `json:"completedDateTime"`
+	DueDateTime          *TaskTime            `json:"dueDateTime"`
+	Recurrence           *TaskRecurrence      `json:"recurrence"`
+	ReminderDateTime     *TaskTime            `json:"reminderDateTime"`
+	StartDateTime        *TaskTime            `json:"startDateTime"`
+	ChecklistItems       []TaskChecklistItems `json:"checklistItems"`
 }
 
 // List object
@@ -134,10 +134,10 @@ type Task struct {
 // list, but only non-nil when retrieved from
 // GetAllTasks
 type List struct {
-	DisplayName       string  `json:"displayName"`
-	Id                string  `json:"id"`
-	IsOwner           bool    `json:"isOwner"`
-	IsShared          bool    `json:"isShared"`
-	WellKnownListName string  `json:"wellKnownListName"`
-	Tasks             *[]Task `json:"tasks"`
+	DisplayName       string `json:"displayName"`
+	Id                string `json:"id"`
+	IsOwner           bool   `json:"isOwner"`
+	IsShared          bool   `json:"isShared"`
+	WellKnownListName string `json:"wellKnownListName"`
+	Tasks             []Task `json:"tasks"`
 }

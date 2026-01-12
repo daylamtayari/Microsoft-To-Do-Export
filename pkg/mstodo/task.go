@@ -39,7 +39,7 @@ func (c *Client) GetAllTasks(completed bool) ([]List, error) {
 		if err != nil {
 			return nil, err
 		}
-		lists[i].Tasks = &tasks
+		lists[i].Tasks = tasks
 	}
 	return lists, nil
 }
