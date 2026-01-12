@@ -74,6 +74,7 @@ func init() {
 	rootCmd.PersistentFlags().String("token-file", "", "File containing token")
 	rootCmd.MarkFlagsMutuallyExclusive("token", "token-file")
 	rootCmd.AddCommand(initListCmd())
+	rootCmd.AddCommand(initExportCmd())
 }
 
 func Execute() {
