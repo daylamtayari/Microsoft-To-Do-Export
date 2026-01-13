@@ -18,7 +18,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "mstodoexport",
+	Use:   "Microsoft-To-Do-Export",
 	Short: "Microsoft To Do Export",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
