@@ -18,7 +18,7 @@ An unofficial solution to export all of your data such as lists, tasks, and atta
 
 ### Export Formats
 - Todoist CSV
-- JSOn
+- JSON
 - Generic CSV
 
 **If there is an export format you want me to add, feel free to create an issue suggesting a format.**
