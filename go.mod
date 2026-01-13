@@ -1,4 +1,4 @@
-module github.com/daylamtayari/Microsoft-To-Do-Export
+module github.com/daylamtayari/Microsoft-To-Do-Export/v2
 
 go 1.25
 
