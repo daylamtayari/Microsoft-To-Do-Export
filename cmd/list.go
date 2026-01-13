@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,10 @@ var listCmd = &cobra.Command{
 		jsonOutput, err := cmd.Flags().GetBool("json")
 		if err != nil {
 			logger.Fatal().Err(err).Msg("Failed to parse json command flag")
+		}
+		rawOutput, err := cmd.Flags().GetBool("raw")
+		if err != nil {
+			logger.Fatal().Err(err).Msg("Failed to parse raw command flag")
 		}
 		outputFile, err := cmd.Flags().GetString("output")
 		if err != nil {
@@ -58,16 +63,29 @@ var listCmd = &cobra.Command{
 				logger.Fatal().Err(err).Msg("Failed to marshal lists to JSON")
 			}
 			fmt.Print(string(outputData))
-		} else {
-			for _, l := range lists {
-				fmt.Print("\n" + l.DisplayName)
+		} else if rawOutput {
+			for i := range lists {
+				if i == 0 {
+					fmt.Print(lists[i].DisplayName)
+				} else {
+					fmt.Print("\n" + lists[i].DisplayName)
+				}
 			}
+		} else {
+			t := table.NewWriter()
+			t.SetStyle(table.StyleRounded)
+			t.AppendHeader(table.Row{"Lists"})
+			for i := range lists {
+				t.AppendRow(table.Row{lists[i].DisplayName})
+			}
+			fmt.Printf("%s\n", t.Render())
 		}
 	},
 }
 
 func initListCmd() *cobra.Command {
 	listCmd.Flags().BoolP("json", "j", false, "JSON output")
+	listCmd.Flags().BoolP("raw", "r", false, "Raw output to stdout with no table")
 	listCmd.Flags().StringP("output", "o", "", "Output file name")
 	return listCmd
 }
