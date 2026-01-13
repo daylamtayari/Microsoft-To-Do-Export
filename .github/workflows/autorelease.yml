@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+"
+    branches:
+      - "master"
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  release:
+    name: "Release"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 10
+    env:
+      GOARCH: amd64
+    strategy:
+      fail-fast: true
+      matrix:
+        goos:
+          - "linux"
+          - "windows"
+          - "darwin"
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: "1.25"
+      - name: "Export GOOS"
+        run: export GOOS=${{ matrix.goos }}
+      - name: "Go Build"
+        if: ${{ matrix.goos != 'windows' }}
+        run: go build -v -trimpath -o ./release/mstodoexport-${{ matrix.goos }}-amd64
+      - name: "Go Build Windows"
+        if: ${{ matrix.goos == 'windows' }}
+        run: go build -v -trimpath -o ./release/mstodoexport-${{ matrix.goos }}-amd64.exe
+      - name: Release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+        with:
+          files: ./release/*
