@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo"
+	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo"
 	"github.com/spf13/cobra"
 )
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo-to-todoistcsv"
+	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo-to-todoistcsv"
 	"github.com/jedib0t/go-pretty/v6/table"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"

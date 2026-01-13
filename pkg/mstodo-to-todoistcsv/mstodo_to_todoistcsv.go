@@ -4,8 +4,8 @@
 package mstodo_to_todoistcsv
 
 import (
-	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo"
-	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/todoistcsv"
+	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo"
+	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/todoistcsv"
 )
 
 func MSToDoToTodoistCsv(taskLists []mstodo.List) *todoistcsv.Export {

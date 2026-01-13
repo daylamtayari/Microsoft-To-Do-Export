@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo"
+	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
