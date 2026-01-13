@@ -1,3 +1,5 @@
+// Complete handling of the Todoist CSV import format,
+// allowing for ease of creating valid import CSV files.
 package todoistcsv
 
 import (
@@ -5,9 +7,6 @@ import (
 	"strings"
 	"time"
 )
-
-// Completed handling of the Todoist CSV import format,
-// allowing for ease of creating valid import CSV files.
 
 // Represents a CSV export file
 type Export struct {

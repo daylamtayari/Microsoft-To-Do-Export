@@ -1,3 +1,6 @@
+// Covertion of Microsoft To Do task lists into
+// Todoist CSV export types, built around the
+// mstodo and todoistcsv libraries.
 package mstodo_to_todoistcsv
 
 import (
