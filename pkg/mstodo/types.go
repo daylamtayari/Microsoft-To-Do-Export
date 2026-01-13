@@ -141,3 +141,15 @@ type List struct {
 	WellKnownListName string `json:"wellKnownListName"`
 	Tasks             []Task `json:"tasks"`
 }
+
+// Attachment object
+// The ContentBytes field contains the base64
+// encoded contents of the attachment
+type Attachment struct {
+	Id                   string `json:"id"`
+	Name                 string `json:"name"`
+	Size                 int    `json:"size"`
+	LastModifiedDateTime MSTime `json:"lastModifiedDateTime"`
+	ContentType          string `json:"contentType"`
+	ContentBytes         string `json:"contentBytes"`
+}
