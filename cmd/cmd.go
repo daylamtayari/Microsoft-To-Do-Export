@@ -22,6 +22,10 @@ var rootCmd = &cobra.Command{
 	Short: "Microsoft To Do Export",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// Skip persistent pre run for version retrieval
+		if cmd.Name() == "version" {
+			return
+		}
 		// Logger handling
 		logger := zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
 		debug, err := cmd.Flags().GetBool("debug")
@@ -76,6 +80,7 @@ func init() {
 	rootCmd.AddCommand(initListCmd())
 	rootCmd.AddCommand(initExportCmd())
 	rootCmd.AddCommand(initAttachmentsCmd())
+	rootCmd.AddCommand(versionCmd)
 }
 
 func Execute() {
