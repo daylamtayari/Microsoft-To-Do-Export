@@ -38,7 +38,7 @@ Download the appropriate binary for your system (Windows, MacOS, or Linux) from 
 
 ## Usage
 
-```bash
+```
 $ Microsoft-To-Do-Export --help
 Microsoft To Do Export
 
@@ -80,7 +80,7 @@ You can pass your token any of the following ways:
 
 ### Export
 
-```bash
+```
 # Example command:
 $ Microsoft-To-Do-Export export --output myexport.csv --type todoist
 
