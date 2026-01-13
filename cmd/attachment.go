@@ -3,8 +3,10 @@ package cmd
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo"
 	"github.com/spf13/cobra"
@@ -119,12 +121,14 @@ var attachmentCmd = &cobra.Command{
 					logger.Error().Err(err).Msgf("Failed to decode the contents of attachment with ID %q", attachment.Id)
 					continue
 				}
-				err = os.WriteFile(filepath.Join(attachOutputDir, attachment.Name), decodedContents, 0644)
+
+				uniqueFilename := getUniqueFilename(attachOutputDir, attachment.Name)
+				err = os.WriteFile(filepath.Join(attachOutputDir, uniqueFilename), decodedContents, 0644)
 				if err != nil {
 					logger.Error().Err(err).Msgf("Failed to write the contents of attachment with ID %q", attachment.Id)
 					continue
 				}
-				logger.Info().Msgf("Exported attachment %q", attachment.Name)
+				logger.Info().Msgf("Exported attachment %q", uniqueFilename)
 			}
 		}
 	},
@@ -136,10 +140,30 @@ func initAttachmentsCmd() *cobra.Command {
 	attachmentCmd.Flags().Bool("completed", false, "Include attachments from completed tasks")
 	attachmentCmd.Flags().Bool("all", false, "Get attachments for all tasks")
 	attachmentCmd.Flags().StringP("output", "o", "mstodo_attachments", "Output directory of attachments (if all attachments retrieved, subdirectories will be automatically created)")
-	attachmentCmd.Flags().Bool("human", false, "Use list and task names for the nested file paths instead of IDs (NOTE: If illegal characters are present or the length of the names are too long, it can fail to create the directories and files)")
 	attachmentCmd.MarkFlagsRequiredTogether("list", "task")
 	attachmentCmd.MarkFlagsMutuallyExclusive("list", "all")
 	attachmentCmd.MarkFlagsMutuallyExclusive("list", "completed")
-	attachmentCmd.MarkFlagsMutuallyExclusive("list", "human")
 	return attachmentCmd
+}
+
+// Returns a unique filename in the specified directory
+// If the file does not exist, returns the original name
+// If the file exists, it appends numbers until the fie
+// does not exist
+func getUniqueFilename(dir, filename string) string {
+	path := filepath.Join(dir, filename)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return filename
+	}
+
+	ext := filepath.Ext(filename)
+	nameWithoutExt := strings.TrimSuffix(filename, ext)
+
+	for i := 1; ; i++ {
+		newFilename := fmt.Sprintf("%s (%d)%s", nameWithoutExt, i, ext)
+		path = filepath.Join(dir, newFilename)
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			return newFilename
+		}
+	}
 }
