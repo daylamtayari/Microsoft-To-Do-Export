@@ -18,7 +18,7 @@ An unofficial solution to export all of your data such as lists, tasks, and atta
 
 ### Export Formats
 - Todoist CSV
-- JSOn
+- JSON
 - Generic CSV
 
 **If there is an export format you want me to add, feel free to create an issue suggesting a format.**
@@ -29,7 +29,7 @@ An unofficial solution to export all of your data such as lists, tasks, and atta
 
 If you already have Go installed, you can install it directly by running:
 ```bash
-go install github.com/daylamtayari/Microsoft-To-Do-Export/cmd/mstodoexport@latest
+go install github.com/daylamtayari/Microsoft-To-Do-Export@latest
 ```
 
 ### Binaries
