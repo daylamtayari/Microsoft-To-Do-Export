@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/pkg/mstodo-to-todoistcsv"
+	"github.com/jedib0t/go-pretty/v6/table"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
@@ -80,6 +81,18 @@ var exportCmd = &cobra.Command{
 			}
 			logger.Debug().Msgf("Wrote output file at %q", outputFile)
 		}
+
+		// Export table
+		t := table.NewWriter()
+		t.SetStyle(table.StyleRounded)
+		t.AppendHeader(table.Row{
+			"Exported Lists",
+			"Tasks",
+		})
+		for i := range taskLists {
+			t.AppendRow(table.Row{taskLists[i].DisplayName, len(taskLists[i].Tasks)})
+		}
+		fmt.Printf("%s\n", t.Render())
 	},
 }
 
