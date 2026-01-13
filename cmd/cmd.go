@@ -75,6 +75,7 @@ func init() {
 	rootCmd.MarkFlagsMutuallyExclusive("token", "token-file")
 	rootCmd.AddCommand(initListCmd())
 	rootCmd.AddCommand(initExportCmd())
+	rootCmd.AddCommand(initAttachmentsCmd())
 }
 
 func Execute() {
