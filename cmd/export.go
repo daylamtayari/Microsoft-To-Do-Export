@@ -84,7 +84,7 @@ var exportCmd = &cobra.Command{
 }
 
 func initExportCmd() *cobra.Command {
-	exportCmd.Flags().Bool("completed", false, "Include completed tasks")
+	exportCmd.Flags().Bool("completed", false, "Include completed tasks (NOTE: IF USING TODOIST EXPORT TYPE, TODOIST'S IMPORT FORMAT HAS NO WAY OF MARKING A TASK AS COMPLETED SO THIS WILL RESULT IN ALL TASKS MARKED AS UNCOMPLETED)")
 	exportCmd.Flags().StringP("output", "o", "mstodo_export.{file_type}", "Output file name")
 	exportCmd.Flags().String("type", "json", "Output type (accepted values: 'json', 'todoist', 'csv')")
 	exportCmd.Flags().BoolP("raw", "r", false, "Output to stdout instead of a file and no table")
