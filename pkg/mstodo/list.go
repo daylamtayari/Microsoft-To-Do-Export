@@ -2,6 +2,7 @@ package mstodo
 
 import "net/http"
 
+// Retrieves all task lists
 func (c *Client) GetLists() ([]List, error) {
 	reqUrl := EndpointV1 + "lists"
 	req, err := http.NewRequest(http.MethodGet, reqUrl, nil)
