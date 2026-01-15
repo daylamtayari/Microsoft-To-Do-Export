@@ -34,7 +34,7 @@ go install github.com/daylamtayari/Microsoft-To-Do-Export@latest
 
 ### Binaries
 
-Download the appropriate binary for your system (Windows, MacOS, or Linux) from the releases page: (https://github.com/daylamtayari/Microsoft-To-Do-Export/releases)[https://github.com/daylamtayari/Microsoft-To-Do-Export/releases]
+Download the appropriate binary for your system (Windows, MacOS, or Linux) from the releases page: [https://github.com/daylamtayari/Microsoft-To-Do-Export/releases](https://github.com/daylamtayari/Microsoft-To-Do-Export/releases)
 
 ## Usage
 
