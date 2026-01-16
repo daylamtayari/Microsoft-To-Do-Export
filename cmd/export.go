@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo-to-todoistcsv"
@@ -64,6 +65,9 @@ var exportCmd = &cobra.Command{
 				outputBuilder.WriteString("\nlist," + taskLists[i].Id + "," + taskLists[i].DisplayName + ",,,")
 				for _, t := range taskLists[i].Tasks {
 					outputBuilder.WriteString("\ntask," + t.Id + "," + t.Title + "," + t.Status + ",\"" + t.Body.Content + "\"," + t.DueDateTime.Time().String())
+					for _, c := range t.ChecklistItems {
+						outputBuilder.WriteString("\nchild task," + c.Id + "," + c.DisplayName + "," + strconv.FormatBool(c.IsChecked) + ",,")
+					}
 				}
 			}
 			outputContents = outputBuilder.String()
