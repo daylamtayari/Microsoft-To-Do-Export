@@ -66,7 +66,7 @@ var exportCmd = &cobra.Command{
 				for _, t := range taskLists[i].Tasks {
 					outputBuilder.WriteString("\ntask," + t.Id + "," + t.Title + "," + t.Status + ",\"" + t.Body.Content + "\"," + t.DueDateTime.Time().String())
 					for _, c := range t.ChecklistItems {
-						outputBuilder.WriteString("\nchild task," + c.Id + "," + c.DisplayName + "," + strconv.FormatBool(c.IsChecked) + ",,")
+						outputBuilder.WriteString("\nstep," + c.Id + "," + c.DisplayName + "," + strconv.FormatBool(c.IsChecked) + ",,")
 					}
 				}
 			}
