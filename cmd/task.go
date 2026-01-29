@@ -136,9 +136,9 @@ var taskCmd = &cobra.Command{
 				if justNames {
 					t.AppendRow(table.Row{task.Title})
 				} else {
-					dueDate := task.DueDateTime.Time().String()
-					if task.DueDateTime == nil {
-						dueDate = ""
+					dueDate := ""
+					if task.DueDateTime != nil {
+						dueDate = task.DueDateTime.Time().String()
 					}
 					t.AppendRow(table.Row{
 						task.Title,

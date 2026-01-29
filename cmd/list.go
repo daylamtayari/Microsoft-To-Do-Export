@@ -12,7 +12,7 @@ import (
 
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List task lists",
+	Short: "Retrieve task lists",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := getLogger(cmd)
 		jsonOutput, err := cmd.Flags().GetBool("json")
