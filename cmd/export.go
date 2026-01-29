@@ -78,6 +78,7 @@ var exportCmd = &cobra.Command{
 
 		if raw {
 			fmt.Print(outputContents)
+			return
 		} else {
 			err = os.WriteFile(outputFile, []byte(outputContents), 0644)
 			if err != nil {
