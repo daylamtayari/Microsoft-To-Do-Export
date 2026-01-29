@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
 	"strconv"
@@ -60,16 +61,33 @@ var exportCmd = &cobra.Command{
 			outputContents = string(jsonOutput)
 		case "csv":
 			var outputBuilder strings.Builder
-			outputBuilder.WriteString("Type,ID,Title,Status,Note,Due Date")
+			csvWriter := csv.NewWriter(&outputBuilder)
+
+			if err := csvWriter.Write([]string{"Type", "ID", "Title", "Status", "Note", "Due Date"}); err != nil {
+				logger.Fatal().Err(err).Msg("Failed to write CSV header")
+			}
+
 			for i := range taskLists {
-				outputBuilder.WriteString("\nlist," + taskLists[i].Id + "," + taskLists[i].DisplayName + ",,,")
+				if err := csvWriter.Write([]string{"list", taskLists[i].Id, taskLists[i].DisplayName, "", "", ""}); err != nil {
+					logger.Error().Err(err).Msg("Failed to write list row to CSV")
+				}
 				for _, t := range taskLists[i].Tasks {
-					outputBuilder.WriteString("\ntask," + t.Id + "," + t.Title + "," + t.Status + ",\"" + t.Body.Content + "\"," + t.DueDateTime.Time().String())
+					dueDate := ""
+					if t.DueDateTime != nil {
+						dueDate = t.DueDateTime.Time().String()
+					}
+					if err := csvWriter.Write([]string{"task", t.Id, t.Title, t.Status, t.Body.Content, dueDate}); err != nil {
+						logger.Error().Err(err).Msg("Failed to write task row to CSV")
+					}
+
 					for _, c := range t.ChecklistItems {
-						outputBuilder.WriteString("\nstep," + c.Id + "," + c.DisplayName + "," + strconv.FormatBool(c.IsChecked) + ",,")
+						if err := csvWriter.Write([]string{"step", c.Id, c.DisplayName, strconv.FormatBool(c.IsChecked), "", ""}); err != nil {
+							logger.Error().Err(err).Msg("Failed to write step row to CSV")
+						}
 					}
 				}
 			}
+			csvWriter.Flush()
 			outputContents = outputBuilder.String()
 		case "todoist":
 			todoistExport := mstodo_to_todoistcsv.MSToDoToTodoistCsv(taskLists)
