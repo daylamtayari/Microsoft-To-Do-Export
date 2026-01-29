@@ -80,6 +80,7 @@ func init() {
 	rootCmd.AddCommand(initListCmd())
 	rootCmd.AddCommand(initExportCmd())
 	rootCmd.AddCommand(initAttachmentsCmd())
+	rootCmd.AddCommand(initTaskCmd())
 	rootCmd.AddCommand(versionCmd)
 }
 
