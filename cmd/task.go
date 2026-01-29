@@ -147,6 +147,18 @@ var taskCmd = &cobra.Command{
 						task.Body.Content,
 					})
 				}
+
+				for _, step := range task.ChecklistItems {
+					if justNames {
+						t.AppendRow(table.Row{"	" + step.DisplayName})
+					} else {
+						status := "notStarted"
+						if step.IsChecked {
+							status = "completed"
+						}
+						t.AppendRow(table.Row{"	" + step.DisplayName, status})
+					}
+				}
 			}
 
 			fmt.Printf("%s\n", t.Render())
