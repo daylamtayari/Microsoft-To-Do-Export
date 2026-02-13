@@ -14,12 +14,14 @@ An unofficial solution to export all of your data such as lists, tasks, and atta
 ### Developer Features
 - `mstodo` package that handles all retrieval interactions for Microsoft To Do
 - `todoistcsv` package that implements the Todoist CSV import format and all of its types
+- `SuperProductivity` package that implements the SuperProductivity import format
 - `mstodo-to-todoistcsv` package that converts a Microsoft To Do list of tasks into a Todoist CSV import format
 
 ### Export Formats
 - Todoist CSV
 - JSON
 - Generic CSV
+- SuperProductivity (WARNING: The export overrides any current state)
 
 **If there is an export format you want me to add, feel free to create an issue suggesting a format.**
 
