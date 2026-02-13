@@ -38,6 +38,8 @@ var exportCmd = &cobra.Command{
 		if outputFile == "mstodo_export.{file_type}" {
 			if outputType == "json" {
 				outputFile = "mstodo_export.json"
+			} else if outputType == "superproductivity" {
+				outputFile = "mstodo_export.superproductivity"
 			} else {
 				outputFile = "mstodo_export.csv"
 			}
@@ -101,6 +103,7 @@ var exportCmd = &cobra.Command{
 				logger.Fatal().Err(err).Msg("Failed to marshal task lists to JSON")
 			}
 			outputContents = string(jsonOutput)
+			fmt.Println("\033[33m⚠️  WARNING: SuperProductivity import will COMPLETELY overwrite the current state\033[0m")
 		}
 
 		if raw {
