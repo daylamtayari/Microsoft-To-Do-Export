@@ -23,7 +23,8 @@ func NewCompleteBackup(data AppDataComplete) *CompleteBackup {
 func generateID() string {
 	// Generate 16 random bytes
 	b := make([]byte, 16)
-	rand.Read(b) //nolint:errcheck - An error can never be handled as if it errors crypto/rand panics
+	// An error can never be handled as if it errors crypto/rand panics
+	rand.Read(b) //nolint:errcheck
 
 	// Encode to base64 URL-safe format and trim to 21 characters
 	id := base64.URLEncoding.EncodeToString(b)
