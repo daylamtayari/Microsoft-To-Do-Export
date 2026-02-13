@@ -96,6 +96,18 @@ func (b *CompleteBackup) AddProject(title string) string {
 		TaskIDs:        []string{},
 		BacklogTaskIDs: []string{},
 		NoteIDs:        []string{},
+		Theme: WorkContextThemeCfg{
+			Primary: "#29a1aa", // DEFAULT_PROJECT_COLOR
+			Accent:  "#ff4081",
+			Warn:    "#e11826",
+		},
+		AdvancedCfg: WorkContextAdvancedCfg{
+			WorklogExportSettings: WorklogExportSettings{
+				Cols:            []string{"DATE", "START", "END", "TIME_CLOCK", "TITLES_INCLUDING_SUB"},
+				GroupBy:         "DATE",
+				SeparateTasksBy: " | ",
+			},
+		},
 	}
 
 	b.Data.Project.IDs = append(b.Data.Project.IDs, projectID)
@@ -121,6 +133,18 @@ func (b *CompleteBackup) AddTag(title string) string {
 		ID:      tagID,
 		Title:   title,
 		TaskIDs: []string{},
+		Theme: WorkContextThemeCfg{
+			Primary: "#a05db1", // DEFAULT_TAG_COLOR
+			Accent:  "#ff4081",
+			Warn:    "#e11826",
+		},
+		AdvancedCfg: WorkContextAdvancedCfg{
+			WorklogExportSettings: WorklogExportSettings{
+				Cols:            []string{"DATE", "START", "END", "TIME_CLOCK", "TITLES_INCLUDING_SUB"},
+				GroupBy:         "DATE",
+				SeparateTasksBy: " | ",
+			},
+		},
 	}
 
 	b.Data.Tag.IDs = append(b.Data.Tag.IDs, tagID)

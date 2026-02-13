@@ -90,11 +90,14 @@ type ProjectState = EntityState[Project]
 
 // Project represents a work context project
 type Project struct {
-	ID             string   `json:"id"`
-	Title          string   `json:"title"`
-	TaskIDs        []string `json:"taskIds"`
-	BacklogTaskIDs []string `json:"backlogTaskIds"`
-	NoteIDs        []string `json:"noteIds"`
+	ID             string                 `json:"id"`
+	Title          string                 `json:"title"`
+	TaskIDs        []string               `json:"taskIds"`
+	BacklogTaskIDs []string               `json:"backlogTaskIds"`
+	NoteIDs        []string               `json:"noteIds"`
+	Theme          WorkContextThemeCfg    `json:"theme"`
+	AdvancedCfg    WorkContextAdvancedCfg `json:"advancedCfg"`
+	Icon           *string                `json:"icon,omitempty"`
 }
 
 // TagState is the entity state for tags
@@ -102,9 +105,38 @@ type TagState = EntityState[Tag]
 
 // Tag represents a work context tag
 type Tag struct {
-	ID      string   `json:"id"`
-	Title   string   `json:"title"`
-	TaskIDs []string `json:"taskIds"`
+	ID          string                 `json:"id"`
+	Title       string                 `json:"title"`
+	TaskIDs     []string               `json:"taskIds"`
+	Theme       WorkContextThemeCfg    `json:"theme"`
+	AdvancedCfg WorkContextAdvancedCfg `json:"advancedCfg"`
+	Icon        *string                `json:"icon,omitempty"`
+}
+
+// WorkContextThemeCfg defines theme configuration for projects and tags
+type WorkContextThemeCfg struct {
+	Primary                  string  `json:"primary"`
+	Accent                   string  `json:"accent"`
+	Warn                     string  `json:"warn"`
+	IsAutoContrast           *bool   `json:"isAutoContrast,omitempty"`
+	HuePrimary               *string `json:"huePrimary,omitempty"`
+	HueAccent                *string `json:"hueAccent,omitempty"`
+	HueWarn                  *string `json:"hueWarn,omitempty"`
+	BackgroundImageDark      *string `json:"backgroundImageDark,omitempty"`
+	BackgroundImageLight     *string `json:"backgroundImageLight,omitempty"`
+	BackgroundOverlayOpacity *int    `json:"backgroundOverlayOpacity,omitempty"`
+}
+
+// WorkContextAdvancedCfg contains advanced configuration for work contexts
+type WorkContextAdvancedCfg struct {
+	WorklogExportSettings WorklogExportSettings `json:"worklogExportSettings"`
+}
+
+// WorklogExportSettings defines settings for exporting work logs
+type WorklogExportSettings struct {
+	Cols            []string `json:"cols"`
+	GroupBy         string   `json:"groupBy"`
+	SeparateTasksBy string   `json:"separateTasksBy"`
 }
 
 // TaskRepeatCfgState is the entity state for task repeat configurations
@@ -145,6 +177,26 @@ func NewEmptyEntityState[T any]() EntityState[T] {
 	}
 }
 
+// createDefaultTheme creates a default theme configuration
+func createDefaultTheme() WorkContextThemeCfg {
+	return WorkContextThemeCfg{
+		Primary: "#6495ED", // DEFAULT_TODAY_TAG_COLOR (for TODAY tag)
+		Accent:  "#ff4081",
+		Warn:    "#e11826",
+	}
+}
+
+// createDefaultAdvancedCfg creates a default advanced configuration
+func createDefaultAdvancedCfg() WorkContextAdvancedCfg {
+	return WorkContextAdvancedCfg{
+		WorklogExportSettings: WorklogExportSettings{
+			Cols:            []string{"DATE", "START", "END", "TIME_CLOCK", "TITLES_INCLUDING_SUB"},
+			GroupBy:         "DATE",
+			SeparateTasksBy: " | ",
+		},
+	}
+}
+
 // NewMinimalAppDataComplete creates a minimal valid AppDataComplete structure
 // Based on Super Productivity's test suite createMinimalValidBackup function
 func NewMinimalAppDataComplete() AppDataComplete {
@@ -155,13 +207,17 @@ func NewMinimalAppDataComplete() AppDataComplete {
 		TaskIDs:        []string{},
 		BacklogTaskIDs: []string{},
 		NoteIDs:        []string{},
+		Theme:          createDefaultTheme(),
+		AdvancedCfg:    createDefaultAdvancedCfg(),
 	}
 
 	// Create required TODAY tag with minimal fields
 	todayTag := Tag{
-		ID:      "TODAY",
-		Title:   "Today",
-		TaskIDs: []string{},
+		ID:          "TODAY",
+		Title:       "Today",
+		TaskIDs:     []string{},
+		Theme:       createDefaultTheme(),
+		AdvancedCfg: createDefaultAdvancedCfg(),
 	}
 
 	return AppDataComplete{
