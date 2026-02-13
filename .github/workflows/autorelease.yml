@@ -11,8 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: "Release"
+  build:
+    name: "Build ${{ matrix.goos }}"
     runs-on: "ubuntu-latest"
     timeout-minutes: 10
     env:
@@ -31,16 +31,35 @@ jobs:
           go-version: "1.25"
       - name: "Go Build"
         if: ${{ matrix.goos != 'windows' }}
-        run: GOOS=${{ matrix.goos }} go build -v -trimpath -o ./release/mstodoexport-${{ matrix.goos }}-amd64
+        run: GOOS=${{ matrix.goos }} go build -v -trimpath -o mstodoexport-${{ matrix.goos }}-amd64
       - name: "Go Build Windows"
         if: ${{ matrix.goos == 'windows' }}
-        run: GOOS=${{ matrix.goos }} go build -v -trimpath -o ./release/mstodoexport-${{ matrix.goos }}-amd64.exe
+        run: GOOS=${{ matrix.goos }} go build -v -trimpath -o mstodoexport-${{ matrix.goos }}-amd64.exe
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: mstodoexport-${{ matrix.goos }}-amd64
+          path: mstodoexport-*
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    name: "Create Release"
+    runs-on: "ubuntu-latest"
+    needs: build
+    timeout-minutes: 10
+    steps:
+      - name: "Download All Artifacts"
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          path: release
+          merge-multiple: true
       - name: "Generate Checksums"
         run: |
           cd release
           sha256sum mstodoexport-* > SHA256SUMS
           md5sum mstodoexport-* > MD5SUMS
-      - name: Release
+      - name: "Create Release"
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
         with:
           files: ./release/*
