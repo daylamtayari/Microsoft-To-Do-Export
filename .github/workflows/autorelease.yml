@@ -35,6 +35,11 @@ jobs:
       - name: "Go Build Windows"
         if: ${{ matrix.goos == 'windows' }}
         run: GOOS=${{ matrix.goos }} go build -v -trimpath -o ./release/mstodoexport-${{ matrix.goos }}-amd64.exe
+      - name: "Generate Checksums"
+        run: |
+          cd release
+          sha256sum mstodoexport-* > SHA256SUMS
+          md5sum mstodoexport-* > MD5SUMS
       - name: Release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
         with:
