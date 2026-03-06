@@ -31,7 +31,7 @@ An unofficial solution to export all of your data such as lists, tasks, and atta
 
 If you already have Go installed, you can install it directly by running:
 ```bash
-go install github.com/daylamtayari/Microsoft-To-Do-Export@latest
+go install github.com/daylamtayari/Microsoft-To-Do-Export/v2@latest
 ```
 
 ### Binaries
