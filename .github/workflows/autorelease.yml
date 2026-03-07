@@ -36,7 +36,7 @@ jobs:
         if: ${{ matrix.goos == 'windows' }}
         run: GOOS=${{ matrix.goos }} go build -v -trimpath -o mstodoexport-${{ matrix.goos }}-amd64.exe
       - name: "Upload Artifact"
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: mstodoexport-${{ matrix.goos }}-amd64
           path: mstodoexport-*
