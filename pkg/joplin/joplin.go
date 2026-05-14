@@ -1,0 +1,120 @@
+package joplin
+
+import (
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+const timeFormat = "2006-01-02T15:04:05.000000-0700"
+
+// Outputs a Joplin UUID (no hyphens) from a provided UUID
+func outputId(uuid uuid.UUID) string {
+	return strings.ReplaceAll(uuid.String(), "-", "")
+}
+
+// Output a note contents in the Joplin format
+func OutputNote(note Note) string {
+	metadata := ""
+	metadata += "\nid: " + outputId(note.Id)
+	if note.ParentId != nil {
+		metadata += "\nparent_id: " + outputId(*note.ParentId)
+	}
+	if note.IsTodo {
+		metadata += "\nis_todo: 1"
+		if note.TodoDue != nil {
+			metadata += "\ntodo_due: " + note.TodoDue.Format(timeFormat)
+		}
+		if note.TodoCompleted != nil {
+			metadata += "\ntodo_completed: " + note.TodoCompleted.Format(timeFormat)
+		}
+	}
+	if note.TagId != nil {
+		metadata += "\ntag_id: " + outputId(*note.TagId)
+	}
+	if note.NoteId != nil {
+		metadata += "\nnote_id: " + outputId(*note.NoteId)
+	}
+	createdTimeStr := note.CreatedTime.Format(timeFormat)
+	metadata += "\ncreated_time: " + createdTimeStr + "\nuser_created_time: " + createdTimeStr
+	metadata += "\ntype_: " + strconv.Itoa(note.Type)
+
+	return note.Title + "\n\n" + note.Body + "\n\n" + metadata
+}
+
+// Creates a folder note
+func CreateFolder(title string, createdAt *time.Time, parent *uuid.UUID) Note {
+	if createdAt == nil {
+		currentTime := time.Now()
+		createdAt = &currentTime
+	}
+	return Note{
+		Id:          uuid.New(),
+		Type:        2,
+		Title:       title,
+		CreatedTime: *createdAt,
+		ParentId:    parent,
+	}
+}
+
+// Creates a generic note
+func CreateNote(title, body string, parent *uuid.UUID, createdAt *time.Time) Note {
+	if createdAt == nil {
+		currentTime := time.Now()
+		createdAt = &currentTime
+	}
+	return Note{
+		Id:          uuid.New(),
+		Type:        1,
+		Title:       title,
+		Body:        body,
+		CreatedTime: *createdAt,
+	}
+}
+
+// Creates a to do note
+func CreateToDo(title, body string, parent *uuid.UUID, due *time.Time, completed *time.Time, createdAt *time.Time) Note {
+	if createdAt == nil {
+		currentTime := time.Now()
+		createdAt = &currentTime
+	}
+	return Note{
+		Id:            uuid.New(),
+		Type:          1,
+		IsTodo:        true,
+		Title:         title,
+		Body:          body,
+		TodoDue:       due,
+		TodoCompleted: completed,
+		CreatedTime:   *createdAt,
+	}
+}
+
+// Creates a tag note
+func CreateTag(name string, createdAt *time.Time) Note {
+	if createdAt == nil {
+		currentTime := time.Now()
+		createdAt = &currentTime
+	}
+	return Note{
+		Id:          uuid.New(),
+		Type:        5,
+		Title:       name,
+		CreatedTime: *createdAt,
+	}
+}
+
+// Create a tag <-> note reference
+func CreateTagNote(tagId uuid.UUID, noteId uuid.UUID) Note {
+	id := uuid.New()
+	return Note{
+		Id:          id,
+		Title:       outputId(id),
+		Type:        6,
+		CreatedTime: time.Now(),
+		TagId:       &tagId,
+		NoteId:      &noteId,
+	}
+}
