@@ -26,10 +26,10 @@ func OutputNote(note Note) string {
 	if note.IsTodo {
 		metadata += "\nis_todo: 1"
 		if note.TodoDue != nil {
-			metadata += "\ntodo_due: " + note.TodoDue.Format(timeFormat)
+			metadata += "\ntodo_due: " + strconv.FormatInt(note.TodoDue.UnixMilli(), 10)
 		}
 		if note.TodoCompleted != nil {
-			metadata += "\ntodo_completed: " + note.TodoCompleted.Format(timeFormat)
+			metadata += "\ntodo_completed: " + strconv.FormatInt(note.TodoCompleted.UnixMilli(), 10)
 		}
 	}
 	if note.TagId != nil {
@@ -114,7 +114,7 @@ func CreateNoteTag(tagId uuid.UUID, noteId uuid.UUID) Note {
 	id := uuid.New()
 	return Note{
 		Id:          id,
-		Title:       OutputId(id),
+		Title:       "",
 		Type:        6,
 		CreatedTime: time.Now(),
 		TagId:       &tagId,

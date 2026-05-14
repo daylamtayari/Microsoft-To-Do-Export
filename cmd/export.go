@@ -319,7 +319,7 @@ func convertTaskToJoplin(task mstodo.Task, listId *uuid.UUID) joplin.Note {
 		body += "## Subtasks"
 		for _, subtask := range task.ChecklistItems {
 			if subtask.IsChecked {
-				body += "\n- [X] "
+				body += "\n- [x] "
 			} else {
 				body += "\n- [ ] "
 			}
@@ -330,12 +330,12 @@ func convertTaskToJoplin(task mstodo.Task, listId *uuid.UUID) joplin.Note {
 
 	body += task.Body.Content
 
-	var due, completed time.Time
+	var due, completed *time.Time
 	if task.DueDateTime != nil {
-		due = task.DueDateTime.Time()
+		due = &task.DueDateTime.Datetime.Time
 	}
 	if task.CompletedDateTime != nil {
-		completed = task.CompletedDateTime.Time()
+		completed = &task.CompletedDateTime.Datetime.Time
 	}
-	return joplin.CreateToDo(task.Title, body, listId, &due, &completed, &task.CreatedDateTime.Time)
+	return joplin.CreateToDo(task.Title, body, listId, due, completed, &task.CreatedDateTime.Time)
 }
