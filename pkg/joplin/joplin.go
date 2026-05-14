@@ -11,16 +11,17 @@ import (
 const timeFormat = "2006-01-02T15:04:05.000000-0700"
 
 // Outputs a Joplin UUID (no hyphens) from a provided UUID
-func outputId(uuid uuid.UUID) string {
+func OutputId(uuid uuid.UUID) string {
 	return strings.ReplaceAll(uuid.String(), "-", "")
 }
 
 // Output a note contents in the Joplin format
 func OutputNote(note Note) string {
 	metadata := ""
-	metadata += "\nid: " + outputId(note.Id)
+	metadata += "\nid: " + OutputId(note.Id)
+	metadata += "\nparent_id: "
 	if note.ParentId != nil {
-		metadata += "\nparent_id: " + outputId(*note.ParentId)
+		metadata += OutputId(*note.ParentId)
 	}
 	if note.IsTodo {
 		metadata += "\nis_todo: 1"
@@ -32,16 +33,16 @@ func OutputNote(note Note) string {
 		}
 	}
 	if note.TagId != nil {
-		metadata += "\ntag_id: " + outputId(*note.TagId)
+		metadata += "\ntag_id: " + OutputId(*note.TagId)
 	}
 	if note.NoteId != nil {
-		metadata += "\nnote_id: " + outputId(*note.NoteId)
+		metadata += "\nnote_id: " + OutputId(*note.NoteId)
 	}
 	createdTimeStr := note.CreatedTime.Format(timeFormat)
 	metadata += "\ncreated_time: " + createdTimeStr + "\nuser_created_time: " + createdTimeStr
 	metadata += "\ntype_: " + strconv.Itoa(note.Type)
 
-	return note.Title + "\n\n" + note.Body + "\n\n" + metadata
+	return note.Title + "\n\n" + note.Body + "\n" + metadata
 }
 
 // Creates a folder note
@@ -113,7 +114,7 @@ func CreateNoteTag(tagId uuid.UUID, noteId uuid.UUID) Note {
 	id := uuid.New()
 	return Note{
 		Id:          id,
-		Title:       outputId(id),
+		Title:       OutputId(id),
 		Type:        6,
 		CreatedTime: time.Now(),
 		TagId:       &tagId,

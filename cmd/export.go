@@ -7,9 +7,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/joplin"
 	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo"
 	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo-to-todoistcsv"
 	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/superproductivity"
+	"github.com/google/uuid"
 	"github.com/jedib0t/go-pretty/v6/table"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
@@ -274,4 +276,66 @@ func convertRecurrenceToRepeatCfg(backup *superproductivity.CompleteBackup, task
 	}
 
 	return backup.AddRepeatCfg(repeatCfg)
+}
+
+// Creates a JEX compilation of notes
+func createJoplinNotes(taskLists []mstodo.List) []joplin.Note {
+	notes := make([]joplin.Note, 0)
+	tagMap := make(map[string]uuid.UUID)
+
+	for _, list := range taskLists {
+		listNote := joplin.CreateFolder(list.DisplayName, nil, nil)
+		notes = append(notes, listNote)
+
+		for _, task := range list.Tasks {
+			taskNote := convertTaskToJoplin(task, &listNote.Id)
+			notes = append(notes, taskNote)
+
+			for _, category := range task.Categories {
+				var tagId uuid.UUID
+				var ok bool
+
+				// If the note for the category/tag DNE, create it
+				if tagId, ok = tagMap[category]; !ok {
+					tag := joplin.CreateTag(category, nil)
+					tagId = tag.Id
+					notes = append(notes, tag)
+					tagMap[category] = tagId
+				}
+
+				notes = append(notes, joplin.CreateNoteTag(tagId, taskNote.Id))
+			}
+		}
+	}
+
+	return notes
+}
+
+// Converts task into a Joplin
+// Category/tag handling is performed in the Joplin export func
+func convertTaskToJoplin(task mstodo.Task, listId *uuid.UUID) joplin.Note {
+	body := ""
+	if len(task.ChecklistItems) > 0 {
+		body += "## Subtasks"
+		for _, subtask := range task.ChecklistItems {
+			if subtask.IsChecked {
+				body += "\n- [X] "
+			} else {
+				body += "\n- [ ] "
+			}
+			body += subtask.DisplayName
+		}
+		body += "\n"
+	}
+
+	body += task.Body.Content
+
+	var due, completed time.Time
+	if task.DueDateTime != nil {
+		due = task.DueDateTime.Time()
+	}
+	if task.CompletedDateTime != nil {
+		completed = task.CompletedDateTime.Time()
+	}
+	return joplin.CreateToDo(task.Title, body, listId, &due, &completed, &task.CreatedDateTime.Time)
 }
