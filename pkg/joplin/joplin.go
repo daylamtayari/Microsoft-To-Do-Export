@@ -68,6 +68,7 @@ func CreateNote(title, body string, parent *uuid.UUID, createdAt *time.Time) Not
 	return Note{
 		Id:          uuid.New(),
 		Type:        1,
+		ParentId:    parent,
 		Title:       title,
 		Body:        body,
 		CreatedTime: *createdAt,
@@ -83,6 +84,7 @@ func CreateToDo(title, body string, parent *uuid.UUID, due *time.Time, completed
 	return Note{
 		Id:            uuid.New(),
 		Type:          1,
+		ParentId:      parent,
 		IsTodo:        true,
 		Title:         title,
 		Body:          body,
@@ -107,7 +109,7 @@ func CreateTag(name string, createdAt *time.Time) Note {
 }
 
 // Create a tag <-> note reference
-func CreateTagNote(tagId uuid.UUID, noteId uuid.UUID) Note {
+func CreateNoteTag(tagId uuid.UUID, noteId uuid.UUID) Note {
 	id := uuid.New()
 	return Note{
 		Id:          id,
