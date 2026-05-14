@@ -40,6 +40,8 @@ func OutputNote(note Note) string {
 	}
 	createdTimeStr := note.CreatedTime.Format(timeFormat)
 	metadata += "\ncreated_time: " + createdTimeStr + "\nuser_created_time: " + createdTimeStr
+	updatedTimeStr := time.Now().Format(timeFormat)
+	metadata += "\nupdated_time: " + updatedTimeStr + "\nuser_updated_time: " + updatedTimeStr
 	metadata += "\ntype_: " + strconv.Itoa(note.Type)
 
 	return note.Title + "\n\n" + note.Body + "\n" + metadata

@@ -366,7 +366,7 @@ func convertTaskToJoplin(task mstodo.Task, listId *uuid.UUID) joplin.Note {
 			}
 			body += subtask.DisplayName
 		}
-		body += "\n"
+		body += "\n\n"
 	}
 
 	body += task.Body.Content
