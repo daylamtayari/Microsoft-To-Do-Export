@@ -26,7 +26,7 @@ jobs:
           - "darwin"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
         with:
           go-version: "1.25"
       - name: "Go Build"
@@ -36,7 +36,7 @@ jobs:
         if: ${{ matrix.goos == 'windows' }}
         run: GOOS=${{ matrix.goos }} go build -v -trimpath -o mstodoexport-${{ matrix.goos }}-amd64.exe
       - name: "Upload Artifact"
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mstodoexport-${{ matrix.goos }}-amd64
           path: mstodoexport-*
@@ -50,7 +50,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: "Download All Artifacts"
-        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: release
           merge-multiple: true
@@ -60,6 +60,6 @@ jobs:
           sha256sum mstodoexport-* > SHA256SUMS
           md5sum mstodoexport-* > MD5SUMS
       - name: "Create Release"
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
         with:
           files: ./release/*
