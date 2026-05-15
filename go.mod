@@ -3,6 +3,7 @@ module github.com/daylamtayari/Microsoft-To-Do-Export/v2
 go 1.25
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/jedib0t/go-pretty/v6 v6.7.8
 	github.com/json-iterator/go v1.1.12
 	github.com/rs/zerolog v1.34.0
