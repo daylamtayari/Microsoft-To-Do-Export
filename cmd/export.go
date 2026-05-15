@@ -1,19 +1,33 @@
 package cmd
 
 import (
+	"archive/tar"
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/joplin"
 	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo"
 	mstodo_to_todoistcsv "github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/mstodo-to-todoistcsv"
 	"github.com/daylamtayari/Microsoft-To-Do-Export/v2/pkg/superproductivity"
+	"github.com/google/uuid"
 	"github.com/jedib0t/go-pretty/v6/table"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
+
+var supportedOutputTypes = []string{
+	"json",
+	"todoist",
+	"csv",
+	"superproductivity",
+	"joplin",
+}
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
@@ -24,7 +38,7 @@ var exportCmd = &cobra.Command{
 		if err != nil {
 			logger.Fatal().Err(err).Msg("Failed to parse output type command flag")
 		}
-		if outputType != "json" && outputType != "todoist" && outputType != "csv" && outputType != "superproductivity" {
+		if !slices.Contains(supportedOutputTypes, outputType) {
 			logger.Fatal().Msgf("Invalid output type %q provided", outputType)
 		}
 		completed, err := cmd.Flags().GetBool("completed")
@@ -36,11 +50,14 @@ var exportCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("Failed to parse output command flag")
 		}
 		if outputFile == "mstodo_export.{file_type}" {
-			if outputType == "json" {
+			switch outputType {
+			case "json":
 				outputFile = "mstodo_export.json"
-			} else if outputType == "superproductivity" {
+			case "superproductivity":
 				outputFile = "mstodo_export.superproductivity"
-			} else {
+			case "joplin":
+				outputFile = "mstodo_export.jex"
+			default:
 				outputFile = "mstodo_export.csv"
 			}
 		}
@@ -55,14 +72,14 @@ var exportCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("Failed to retrieve all tasks")
 		}
 
-		var outputContents string
+		var outputContents bytes.Buffer
 		switch outputType {
 		case "json":
 			jsonOutput, err := jsoniter.Marshal(taskLists)
 			if err != nil {
 				logger.Fatal().Err(err).Msg("Failed to marshal task lists to JSON")
 			}
-			outputContents = string(jsonOutput)
+			outputContents.Write(jsonOutput)
 		case "csv":
 			var outputBuilder strings.Builder
 			csvWriter := csv.NewWriter(&outputBuilder)
@@ -92,25 +109,51 @@ var exportCmd = &cobra.Command{
 				}
 			}
 			csvWriter.Flush()
-			outputContents = outputBuilder.String()
+			outputContents.Write([]byte(outputBuilder.String()))
 		case "todoist":
 			todoistExport := mstodo_to_todoistcsv.MSToDoToTodoistCsv(taskLists)
-			outputContents = todoistExport.CSV()
+			outputContents.Write([]byte(todoistExport.CSV()))
 		case "superproductivity":
 			sBackup := createSuperproductivityExport(taskLists)
 			jsonOutput, err := jsoniter.Marshal(sBackup)
 			if err != nil {
 				logger.Fatal().Err(err).Msg("Failed to marshal task lists to JSON")
 			}
-			outputContents = string(jsonOutput)
+			outputContents.Write(jsonOutput)
 			fmt.Println("\033[33m⚠️  WARNING: SuperProductivity import will COMPLETELY overwrite the current state\033[0m")
+		case "joplin":
+			joplinNotes := createJoplinNotes(taskLists)
+			tw := tar.NewWriter(&outputContents)
+			for _, note := range joplinNotes {
+				body := []byte(joplin.OutputNote(note))
+				err := tw.WriteHeader(&tar.Header{
+					Name:    joplin.OutputId(note.Id) + ".md",
+					Mode:    0644,
+					Size:    int64(len(body)),
+					ModTime: note.CreatedTime,
+					Format:  tar.FormatPAX,
+				})
+				if err != nil {
+					logger.Error().Err(err).Msgf("Failed to write tar headers for note %s", joplin.OutputId(note.Id))
+					continue
+				}
+				_, err = tw.Write(body)
+				if err != nil {
+					logger.Error().Err(err).Msgf("Failed to write body to tar for note %s", joplin.OutputId(note.Id))
+					continue
+				}
+			}
+			err := tw.Close()
+			if err != nil {
+				logger.Fatal().Err(err).Msg("Failed to close tar writer")
+			}
 		}
 
 		if raw {
 			fmt.Print(outputContents)
 			return
 		} else {
-			err = os.WriteFile(outputFile, []byte(outputContents), 0644)
+			err = os.WriteFile(outputFile, outputContents.Bytes(), 0644)
 			if err != nil {
 				logger.Fatal().Err(err).Msg("Failed to write output file")
 			}
@@ -134,7 +177,7 @@ var exportCmd = &cobra.Command{
 func initExportCmd() *cobra.Command {
 	exportCmd.Flags().Bool("completed", false, "Include completed tasks (NOTE: IF USING TODOIST EXPORT TYPE, TODOIST'S IMPORT FORMAT HAS NO WAY OF MARKING A TASK AS COMPLETED SO THIS WILL RESULT IN ALL TASKS MARKED AS UNCOMPLETED)")
 	exportCmd.Flags().StringP("output", "o", "mstodo_export.{file_type}", "Output file name")
-	exportCmd.Flags().String("type", "json", "Output type (accepted values: 'json', 'todoist', 'csv', 'superproductivity')")
+	exportCmd.Flags().String("type", "json", "Output type (accepted values: 'json', 'todoist', 'csv', 'superproductivity', 'joplin')")
 	exportCmd.Flags().BoolP("raw", "r", false, "Output to stdout instead of a file and no table")
 	exportCmd.MarkFlagsMutuallyExclusive("output", "raw")
 	return exportCmd
@@ -274,4 +317,66 @@ func convertRecurrenceToRepeatCfg(backup *superproductivity.CompleteBackup, task
 	}
 
 	return backup.AddRepeatCfg(repeatCfg)
+}
+
+// Creates a JEX compilation of notes
+func createJoplinNotes(taskLists []mstodo.List) []joplin.Note {
+	notes := make([]joplin.Note, 0)
+	tagMap := make(map[string]uuid.UUID)
+
+	for _, list := range taskLists {
+		listNote := joplin.CreateFolder(list.DisplayName, nil, nil)
+		notes = append(notes, listNote)
+
+		for _, task := range list.Tasks {
+			taskNote := convertTaskToJoplin(task, &listNote.Id)
+			notes = append(notes, taskNote)
+
+			for _, category := range task.Categories {
+				var tagId uuid.UUID
+				var ok bool
+
+				// If the note for the category/tag DNE, create it
+				if tagId, ok = tagMap[category]; !ok {
+					tag := joplin.CreateTag(category, nil)
+					tagId = tag.Id
+					notes = append(notes, tag)
+					tagMap[category] = tagId
+				}
+
+				notes = append(notes, joplin.CreateNoteTag(tagId, taskNote.Id))
+			}
+		}
+	}
+
+	return notes
+}
+
+// Converts task into a Joplin
+// Category/tag handling is performed in the Joplin export func
+func convertTaskToJoplin(task mstodo.Task, listId *uuid.UUID) joplin.Note {
+	body := ""
+	if len(task.ChecklistItems) > 0 {
+		body += "## Subtasks"
+		for _, subtask := range task.ChecklistItems {
+			if subtask.IsChecked {
+				body += "\n- [x] "
+			} else {
+				body += "\n- [ ] "
+			}
+			body += subtask.DisplayName
+		}
+		body += "\n\n"
+	}
+
+	body += task.Body.Content
+
+	var due, completed *time.Time
+	if task.DueDateTime != nil {
+		due = &task.DueDateTime.Datetime.Time
+	}
+	if task.CompletedDateTime != nil {
+		completed = &task.CompletedDateTime.Datetime.Time
+	}
+	return joplin.CreateToDo(task.Title, body, listId, due, completed, &task.CreatedDateTime.Time)
 }
