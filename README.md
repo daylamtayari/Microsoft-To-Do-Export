@@ -22,6 +22,7 @@ An unofficial solution to export all of your data such as lists, tasks, and atta
 - JSON
 - Generic CSV
 - SuperProductivity (WARNING: The export overrides any current state)
+- Joplin JEX format
 
 **If there is an export format you want me to add, feel free to create an issue suggesting a format.**
 
@@ -98,7 +99,7 @@ Flags:
   -h, --help            help for export
   -o, --output string   Output file name (default "mstodo_export.{file_type}")
   -r, --raw             Output to stdout instead of a file and no table
-      --type string     Output type (accepted values: 'json', 'todoist', 'csv') (default "json")
+      --type string     Output type (accepted values: 'json', 'todoist', 'csv', 'superproductivity', 'joplin') (default "json")
 
 Global Flags:
       --debug               Enable debug logging
