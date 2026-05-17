@@ -1,7 +1,6 @@
 package mstodo
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -9,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 	"golang.org/x/oauth2"
@@ -98,80 +98,52 @@ func (c *Client) Do(req *http.Request, v any) error {
 }
 
 // A wrapper of the Do method for requests with paginated responses.
-// Requires v to be a list type
+// Requires v to be a list type. The request is expected to be bodyless
+// (every paginated Graph endpoint used here is a GET).
 func (c *Client) PaginatedDo(req *http.Request, v any) error {
-	// Have to read and then re-assign the request body value since it can only be read once.
-	var reqBody []byte
-	var err error
-	if req.Body != nil {
-		body, err := io.ReadAll(req.Body)
-		if err != nil {
-			return err
-		}
-		req.Body = io.NopCloser(bytes.NewReader(body))
-	} else {
-		reqBody = nil
-	}
 	reqCtx := req.Context()
 	reqValues := req.URL.Query()
 
 	var res []byte
-	err = c.Do(req, &res)
+	err := c.Do(req, &res)
 	if err != nil {
 		return err
 	}
 
-	nextLink := jsoniter.Get(res, "@odata.nextLink")
-	values := jsoniter.Get(res, "value")
-	if values == nil || values.ValueType() == jsoniter.InvalidValue {
-		return ErrValueRetrieval
-	}
-
-	if nextLink == nil || nextLink.ValueType() == jsoniter.InvalidValue {
-		err = jsoniter.UnmarshalFromString(values.ToString(), &v)
-		return err
-	} else {
-		combinedValues := values.ToString()
-		// Remove final square bracket to allow for a single JSON array
-		combinedValues = combinedValues[:len(combinedValues)-1]
-		hasNextLink := true
-		for hasNextLink {
-			skipValue := getSkipValue(nextLink.ToString())
-			if skipValue == -1 {
-				hasNextLink = false
-				continue
-			}
-			nextReq := req.Clone(reqCtx)
-			nextReq.Body = io.NopCloser(bytes.NewReader(reqBody))
-			reqValues.Set("$skip", strconv.Itoa(skipValue))
-			nextReq.URL.RawQuery = reqValues.Encode()
-			res = []byte{}
-			err = c.Do(nextReq, &res)
-			if err != nil {
-				return err
-			}
-
-			values := jsoniter.Get(res, "value")
-			if values == nil || values.ValueType() == jsoniter.InvalidValue {
-				return ErrValueRetrieval
-			}
-			reqValues := values.ToString()
-			// Remove leading and trailing square backets as well as add a leading comma
-			reqValues = reqValues[1 : len(reqValues)-1]
-			combinedValues += "," + reqValues
-
-			nextLink = jsoniter.Get(res, "@odata.nextLink")
-			if nextLink == nil || nextLink.ValueType() == jsoniter.InvalidValue {
-				hasNextLink = false
-			}
+	// Retrieve all of the elements across multiple pages of data
+	var elements []string
+	for {
+		values := jsoniter.Get(res, "value")
+		if values == nil || values.ValueType() == jsoniter.InvalidValue {
+			return ErrValueRetrieval
 		}
-		combinedValues += "]"
-		err = jsoniter.UnmarshalFromString(combinedValues, &v)
+		// Strip the enclosing square brackets of the page's array and check if not empty
+		page := values.ToString()
+		if inner := page[1 : len(page)-1]; inner != "" {
+			elements = append(elements, inner)
+		}
+
+		nextLink := jsoniter.Get(res, "@odata.nextLink")
+		if nextLink == nil || nextLink.ValueType() == jsoniter.InvalidValue {
+			break
+		}
+		skipValue := getSkipValue(nextLink.ToString())
+		if skipValue == -1 {
+			break
+		}
+
+		nextReq := req.Clone(reqCtx)
+		reqValues.Set("$skip", strconv.Itoa(skipValue))
+		nextReq.URL.RawQuery = reqValues.Encode()
+		res = []byte{}
+		err = c.Do(nextReq, &res)
 		if err != nil {
 			return err
 		}
 	}
-	return nil
+
+	combinedValues := "[" + strings.Join(elements, ",") + "]"
+	return jsoniter.UnmarshalFromString(combinedValues, &v)
 }
 
 // Gets the skip value from a next link
