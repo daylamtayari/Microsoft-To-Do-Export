@@ -9,12 +9,17 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	"golang.org/x/oauth2"
 )
 
 const EndpointV1 = "https://graph.microsoft.com/v1.0/me/todo/"
+
+// maxRetries is the number of additional attempts made after a request
+// fails with a retryable status code (429 or 5xx).
+const maxRetries = 4
 
 var nextLinkRe = regexp.MustCompile(`\$skip=([0-9]+)`)
 
@@ -57,13 +62,14 @@ func NewClient(httpClient *http.Client, token *string) *Client {
 // If a pointer to a byte array is provided, the value will be
 // the value of the body.
 func (c *Client) Do(req *http.Request, v any) error {
-	res, err := c.client.Do(req)
+	res, err := c.doWithRetry(req)
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close() //nolint:errcheck
+
 	var body []byte
 	if res.ContentLength != 0 && (res.StatusCode == 200 || res.StatusCode == 201) {
-		defer res.Body.Close() //nolint:errcheck
 		body, err = io.ReadAll(res.Body)
 		if err != nil {
 			return err
@@ -95,6 +101,43 @@ func (c *Client) Do(req *http.Request, v any) error {
 	default:
 		return fmt.Errorf("%w: %d", ErrNonHandledStatus, res.StatusCode)
 	}
+}
+
+// doWithRetry sends req, retrying on throttling (429) and transient server
+// errors (5xx) up to maxRetries times. It honors the Retry-After header
+// when present, falling back to exponential backoff otherwise. All Graph
+// requests are bodyless GETs, so req is safe to resend as-is.
+func (c *Client) doWithRetry(req *http.Request) (*http.Response, error) {
+	for attempt := 0; ; attempt++ {
+		res, err := c.client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		if attempt == maxRetries || !isRetryableStatus(res.StatusCode) {
+			return res, nil
+		}
+		delay := retryDelay(res.Header.Get("Retry-After"), attempt)
+		res.Body.Close() //nolint:errcheck
+		time.Sleep(delay)
+	}
+}
+
+// isRetryableStatus reports whether a response status code represents a
+// transient failure worth retrying: throttling (429) or a server error.
+func isRetryableStatus(statusCode int) bool {
+	return statusCode == http.StatusTooManyRequests || statusCode >= 500
+}
+
+// retryDelay determines how long to wait before the next retry attempt,
+// preferring the server-provided Retry-After value (in seconds) and
+// falling back to exponential backoff (1s, 2s, 4s, 8s, ...).
+func retryDelay(retryAfterHeader string, attempt int) time.Duration {
+	if retryAfterHeader != "" {
+		if seconds, err := strconv.ParseFloat(retryAfterHeader, 64); err == nil {
+			return time.Duration(seconds * float64(time.Second))
+		}
+	}
+	return time.Duration(1<<attempt) * time.Second
 }
 
 // A wrapper of the Do method for requests with paginated responses.
