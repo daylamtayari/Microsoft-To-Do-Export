@@ -3,6 +3,7 @@
 package todoistcsv
 
 import (
+	"encoding/csv"
 	"strconv"
 	"strings"
 	"time"
@@ -29,27 +30,40 @@ func (e *Export) SetMeta(meta Meta) {
 	e.Meta = meta
 }
 
+// Number of columns in a Todoist CSV import file
+const columnCount = 14
+
 // Returns the contents of a Todoist CSV import file
 func (e *Export) CSV() string {
 	var csvBuilder strings.Builder
+	writer := csv.NewWriter(&csvBuilder)
 
 	// Write header row and meta field
-	csvBuilder.WriteString("TYPE,CONTENT,DESCRIPTION,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE,DURATION,DURATION_UNIT,DEADLINE,DEADLINE_LANG")
-	csvBuilder.WriteString("\nmeta," + string(e.Meta) + ",,,,,,,,,,,,")
-	csvBuilder.WriteString("\n,,,,,,,,,,,,,")
+	writeRecord(writer, "TYPE", "CONTENT", "DESCRIPTION", "PRIORITY", "INDENT", "AUTHOR", "RESPONSIBLE", "DATE", "DATE_LANG", "TIMEZONE", "DURATION", "DURATION_UNIT", "DEADLINE", "DEADLINE_LANG")
+	writeRecord(writer, "meta", string(e.Meta))
+	writeRecord(writer)
 
 	// Write all sections and tasks
 	for i := range e.Sections {
-		csvBuilder.WriteString("\n" + string(SectionType) + "," + e.Sections[i].Title + ",,,,,,,,,,,,")
+		writeRecord(writer, string(SectionType), e.Sections[i].Title)
 		for j := range e.Sections[i].Tasks {
-			exportTask(&csvBuilder, e.Sections[i].Tasks[j])
+			exportTask(writer, e.Sections[i].Tasks[j])
 		}
 	}
 
-	return csvBuilder.String()
+	writer.Flush()
+	return strings.TrimSuffix(csvBuilder.String(), "\n")
 }
 
-func exportTask(builder *strings.Builder, task Task) {
+// Writes a record padded with empty fields to the full column count.
+// The csv.Writer quotes any field containing a comma, quote, or newline.
+func writeRecord(writer *csv.Writer, fields ...string) {
+	record := make([]string, columnCount)
+	copy(record, fields)
+	_ = writer.Write(record) // Writes to a strings.Builder cannot fail
+}
+
+func exportTask(writer *csv.Writer, task Task) {
 	// Handling values from struct to export values
 	author := ""
 	if task.Author != nil {
@@ -86,17 +100,22 @@ func exportTask(builder *strings.Builder, task Task) {
 	}
 
 	// Write task
-	builder.WriteString("\n" + string(TaskType) + "," + string(task.Title) + "," + string(task.Description) + "," + strconv.Itoa(int(task.Priority)) + "," + strconv.Itoa(int(task.Subtask)) + "," + author + "," + responsible + "," + date + "," + dateLang + "," + timezone + "," + duration + "," + string(task.DurationUnit) + "," + deadline + "," + deadlineLang)
+	writeRecord(writer, string(TaskType), normalizeNewlines(string(task.Title)), normalizeNewlines(string(task.Description)), strconv.Itoa(int(task.Priority)), strconv.Itoa(int(task.Subtask)), author, responsible, date, dateLang, timezone, duration, string(task.DurationUnit), deadline, deadlineLang)
 
 	// Write all notes
 	for i := range task.Notes {
-		builder.WriteString("\n" + string(NoteType) + "," + string(task.Notes[i].Content) + ",,,,,,,,,,,,")
+		writeRecord(writer, string(NoteType), normalizeNewlines(string(task.Notes[i].Content)))
 	}
 
 	// Recursively call for any child tasks
 	for i := range task.ChildTasks {
-		exportTask(builder, task.ChildTasks[i])
+		exportTask(writer, task.ChildTasks[i])
 	}
+}
+
+// Converts Windows-style line endings to plain newlines
+func normalizeNewlines(s string) string {
+	return strings.ReplaceAll(s, "\r\n", "\n")
 }
 
 type Section struct {
